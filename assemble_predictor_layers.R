@@ -387,10 +387,6 @@ nlcd_rast <- terra::crop(nlcd_rast, bcr_conical) %>%
   terra::project("EPSG:5070")
 # plot(nlcd_rast)
 
-pclass <- function(x, y=c(41)) {
-  return( length(which(x %in% y)) / length(x) )
-}
-
 decid_rast <- terra::classify(nlcd_rast, rcl = matrix(c(41, 1), 1, 2), others = 0)
 
 prop_decid <- terra::aggregate(decid_rast, 4, fun = sum) #aggregate to 120m; TODO change this to a specified scale
@@ -416,16 +412,20 @@ plot(prop_forest)
 
 terra::writeRaster(prop_forest, "./predictor_layers/prop_forest.tiff", overwrite = TRUE)
 
-grass_shrub_rast <- terra::classify(nlcd_rast, rcl = matrix(c(52, 1,
-                                                              71,1,
-                                                              81,1), 3, 2), others = 0)
-prop_grass_shrub <- terra::aggregate(grass_shrub_rast, 4, fun = sum)
-prop_grass_shrub <- prop_grass_shrub/16
-plot(prop_grass_shrub)
+grass_rast <- terra::classify(nlcd_rast, rcl = matrix(c( 71,1,
+                                                         81,1), 2, 2), others = 0)
+prop_grass <- terra::aggregate(grass_rast, 4, fun = sum)
+prop_grass<- prop_grass/16
+plot(prop_grass)
 
-terra::writeRaster(prop_grass_shrub, "./predictor_layers/prop_grass_shrub.tiff", overwrite = TRUE)
+terra::writeRaster(prop_grass, "./predictor_layers/prop_grass.tiff", overwrite = TRUE)
 
+shrub_rast <- terra::classify(nlcd_rast, rcl = matrix(c(52, 1), 1, 2), others = 0)
 
+prop_shrub <- terra::aggregate(shrub_rast, 4, fun = sum) #aggregate to 120m; TODO change this to a specified scale
+prop_shrub <- prop_shrub/16
+plot(prop_shrub)
+terra::writeRaster(prop_shrub, "./predictor_layers/prop_shrub.tiff", overwrite = TRUE)
 
 #--------------------------------
 # Import predictor data layers

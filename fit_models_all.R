@@ -8,7 +8,7 @@ library("sf")
 #--------------------------
 
 
-species <- "gwwa"
+species <- "cerw"
 
 ###### BRT
 data <- list.files("./environment_vars/", pattern = species, full.names = TRUE) %>%

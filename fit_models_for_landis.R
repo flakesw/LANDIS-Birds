@@ -6,7 +6,7 @@ library("dismo")
 library("terra")
 library("sf")
 #--------------------------
-species <- "cerw"
+species <- "gwwa"
 
 ###### BRT
 data <- list.files("./environment_vars/", pattern = species, full.names = TRUE) %>%

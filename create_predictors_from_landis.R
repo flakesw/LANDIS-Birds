@@ -3,7 +3,7 @@ library("terra")
 library("sf")
 library("tidyverse")
 
-model_name <- "HighTHighV BAU"
+model_name <- "LowTLowV BAU"
 model_dir <- paste0("D:/SApps LANDIS/Model templates/", model_name, "/")
 input_dir <- "D:/SApps LANDIS/Inputs/"
 year <- 60
@@ -22,13 +22,15 @@ predictor_stack2 <- predictor_stack %>%
   mask(ecoregions, maskvalues = 1)
 names(predictor_stack)
 
+comm_rast <- terra::ifel(comm_map %in% comm_output$MapCode, comm_map, NA)
+
 #biomass
 comm_output[comm_output[] == 0] <- NA
 
 total_biomass <- comm_output %>%
   group_by(MapCode) %>%
   summarise(biomass = sum(CohortBiomass))
-biomass_rast <- terra::ifel(comm_map %in% total_biomass$MapCode, comm_map, 0)
+biomass_rast <- comm_rast
 biomass_rast <- terra::subst(x = biomass_rast, 
                              from = total_biomass$MapCode, 
                              to = total_biomass$biomass) / 100 #convert to tonnes ha-1
@@ -37,26 +39,69 @@ biomass2 <- ecoregions
 biomass2[] <- biomass_rast[]
 # saveRDS(biomass_rast, "biomass_raster_60.RDS")
 
+# lai <- terra::rast(paste0(model_dir, "/NECN/LAI-5.img"))
+
 #understory_ratio 
-under_ratio <- comm_output %>%
-  mutate(understory = CohortAge <= 20) %>%
-  group_by(MapCode, understory) %>%
-  summarise(biomass = sum(CohortBiomass)) %>%
-  tidyr::pivot_wider(names_from = understory, values_from = biomass, values_fill = 0) %>%
-  mutate(understory_ratio = `TRUE`/(`TRUE`+ `FALSE`)) %>%
-  dplyr::select(MapCode, understory_ratio)
-under_rast <- terra::ifel(comm_map %in% under_ratio$MapCode, comm_map, NA)
-under_rast <-  terra::subst(x = under_rast, 
-                            from = under_ratio$MapCode, 
-                            to = under_ratio$understory_ratio)
-plot(under_rast)
-under2 <- ecoregions
-under2[] <- under_rast[]
+# under_ratio <- comm_output %>%
+#   mutate(understory = as.integer(CohortAge <= 30)) %>%
+#   mutate(understory = ifelse(SpeciesName %in% c("CornFlor", "AmelArbo", "AcerPens", 
+#                                                 "HaleDipt", "OxydArbo", "SassAlid"),
+#                              1, understory)) %>%
+#   mutate(understory = ifelse(understory == 0, 0.5, understory)) %>%
+#   mutate(understory_biomass = understory*CohortBiomass) %>%
+#   group_by(MapCode) %>%
+#   summarise(understory_ratio = sum(understory_biomass) / sum(CohortBiomass)) 
+# under_rast <- terra::ifel(comm_map %in% under_ratio$MapCode, comm_map, NA)
+# under_rast <-  terra::subst(x = under_rast, 
+#                             from = under_ratio$MapCode, 
+#                             to = under_ratio$understory_ratio)
+# plot(under_rast)
+# under2 <- ecoregions
+# under2[] <- under_rast[]
+
+#mean_age
+mean_age <- comm_output %>%
+  group_by(MapCode) %>%
+  summarise(mean_age = mean(CohortAge)) 
+age_rast <- comm_rast
+age_rast <-  terra::subst(x = age_rast, 
+                            from = mean_age$MapCode, 
+                            to = mean_age$mean_age)
+plot(age_rast)
+age2 <- ecoregions
+age2[] <- age_rast[]
+under2 <- age2/200
 
 # saveRDS(under_rast, "understory_raster_60.RDS")
 
 
+#foliage height diversity
+# fhd <- comm_output %>%
+#   group_by(MapCode) %>%
+#   summarize(age_diversity = )
+#   mutate(understory = as.integer(CohortAge <= 30)) %>%
+#   mutate(understory = ifelse(SpeciesName %in% c("CornFlor", "AmelArbo", "AcerPens", 
+#                                                 "HaleDipt", "OxydArbo", "SassAlid"),
+#                              1, understory)) %>%
+#   mutate(understory = ifelse(understory == 0, 0.5, understory)) %>%
+#   mutate(understory_biomass = understory*CohortBiomass) %>%
+#   group_by(MapCode) %>%
+#   summarise(understory_ratio = sum(understory_biomass) / sum(CohortBiomass)) 
+# under_rast <- terra::ifel(comm_map %in% under_ratio$MapCode, comm_map, NA)
+# under_rast <-  terra::subst(x = under_rast, 
+#                             from = under_ratio$MapCode, 
+#                             to = under_ratio$understory_ratio)
+# plot(under_rast)
+# under2 <- ecoregions
+# under2[] <- under_rast[]
+
+
 #deciduousness
+#areas dominated by trees generally greater than 5 meters tall, 
+#and greater than 20% of total vegetation cover. 
+#More than 75% of the tree species shed foliage simultaneously in response to seasonal change.
+#TODO convert LAI to total veg coverhttp://127.0.0.1:35167/graphics/plot_zoom_png?width=826&height=886
+
 decid_all <- comm_output
 decid_all$decid = !grepl("Pinu|Tsug", comm_output$SpeciesName)
 decid_sum <- decid_all %>%
@@ -65,16 +110,19 @@ decid_sum <- decid_all %>%
 deciduous <- decid_sum %>% 
   group_by(MapCode) %>%
   tidyr::pivot_wider(names_from = decid, values_from = biomass, values_fill = 0) %>%
-  mutate(decid = `TRUE`/(`TRUE`+ `FALSE`)) %>%
+  mutate(decid_prop = `TRUE`/(`TRUE`+ `FALSE`)) %>%
+  mutate(decid = ifelse(decid_prop > 0.75, 1, 0)) %>%
   dplyr::select(MapCode, decid)
-decid_rast <- terra::ifel(comm_map %in% deciduous$MapCode, comm_map, NA)
+decid_rast <- comm_rast
 decid_rast <-  terra::subst(x = decid_rast, 
                             from = deciduous$MapCode, 
                             to = deciduous$decid)
-decid_rast <- decid_rast
-plot(decid_rast)
+# decid_rast[is.na(decid_rast[])] <- 0
+decid_smooth <- terra::focal(decid_rast, 5, fun = mean, na.rm = TRUE)
+
 decid2 <- ecoregions
-decid2[] <- decid_rast[]
+decid2[] <- decid_smooth[]
+decid2 <-  mask(decid2, ecoregions, maskvalues = 1)
 
 #climate variables
 if(year > 0){
@@ -82,8 +130,8 @@ if(year > 0){
     filter(Year > 2005 + year - 10 & Year <= 2005 + year, 
            Timestep > 182 & Timestep < 273) %>%
     group_by(EcoregionIndex) %>%
-    summarise(tmax = median(max_airtemp)*100,#rescale to match GEE output
-              tmin = median(min_airtemp)*100,
+    summarise(tmax = median(max_airtemp)*10,#rescale to match GEE output
+              tmin = median(min_airtemp)*10,
               precip = median(ppt)*1000)
   tmax_rast <- ecoregions %>%
     terra::subst(from = summer_clim$EcoregionIndex + 2, #add 2 to line up with ecoregions; different for each model!
@@ -113,8 +161,8 @@ if(year == 0){
                   # predictor_stack2$soil,
                   # predictor_stack2$vpd,
                   # predictor_stack2$pdsi,
-                  predictor_stack2$tmmn/10,
-                  predictor_stack2$tmmx/10,
+                  predictor_stack2$tmmn,
+                  predictor_stack2$tmmx,
                   predictor_stack2$pr,
                   predictor_stack2$slope,
                   predictor_stack2$chili,

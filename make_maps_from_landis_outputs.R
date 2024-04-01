@@ -1,19 +1,36 @@
 #make maps from LANDIS outputs
-
-
 #full model
+library("terra")
+library("sf")
+library("tidyverse")
 library("dismo")
+library("gbm")
+library("tidyverse")
+
+ecoregions <- terra::rast("C:/Users/Sam/Documents/Research/Project-Southern-Appalachians-2018/Models/LANDIS_Sapps_Ecosystem_Papers/Ecos11_NCLD.tif")
 
 full_model <- readRDS("./models_for_landis/cerw_dist_model_full_landis.RDS")
 
-predictor_stack <- terra::rast("landis_predictor_layers/pred_stack_LowTLowV BAU_0.tif")
 
-preds <- terra::predict(object = predictor_stack, 
+predictor_stack_0 <- terra::rast("landis_predictor_layers/pred_stack_LowTLowV BAU_0.tif")%>%
+  terra::project(ecoregions) %>%
+  mask(ecoregions, maskvalues = 1)
+predictor_stack_0$understory_ratio <- predictor_stack_0$understory_ratio * 12.8
+
+predictor_stack_60 <- terra::rast("landis_predictor_layers/pred_stack_LowTLowV BAU_60.tif")%>%
+  terra::project(ecoregions) %>%
+  mask(ecoregions, maskvalues = 1)
+
+pred_stack_orig <- terra::rast("predictor_layers/predictor_stack.grd") %>%
+  terra::project(ecoregions) %>%
+  mask(ecoregions, maskvalues = 1)
+
+preds <- terra::predict(object = predictor_stack_0, #pred_stack_orig, 
                         model = full_model,
                         # ext = st_bbox(bcr_albers),
                         const = data.frame(time_observations_started = 7,
                                            duration_minutes = 60)
-)
+                        )
 
 values(preds) <- boot::inv.logit(values(preds))
 preds <- crop(preds, ecoregions) %>%

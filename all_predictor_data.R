@@ -13,7 +13,7 @@ library("terra")
 #ee_install_upgrade()
 ee_Initialize(user = "swflake@ncsu.edu", drive = TRUE)
 
-species <- "cerw"
+species <- "gwwa"
 
 bufferBy100 = function(feature) {
   feature$buffer(feature)
@@ -286,7 +286,8 @@ nlcd_points <- terra::extract(nlcd, vect(ebird_buff_nlcd), raw = TRUE) %>%
             prop_forest = sum(`NLCD Land Cover Class` %in% c(41,42,43))/total_cells,
             prop_decid = sum(`NLCD Land Cover Class` %in% c(41))/total_cells,
             prop_conifer = sum(`NLCD Land Cover Class` %in% c(42))/total_cells,
-            prop_grass = sum(`NLCD Land Cover Class` %in% c(52, 71, 81))/total_cells) %>%
+            prop_grass = sum(`NLCD Land Cover Class` %in% c(71, 81))/total_cells,
+            prop_shrub = sum(`NLCD Land Cover Class` %in% c(52))/total_cells) %>%
   cbind(ebird_buff_nlcd)
 
 #--------------------------------------------------------------------------
@@ -319,7 +320,7 @@ combined <- left_join(dplyr::select(ebird_buff_albers %>% st_drop_geometry(),
                                     understory_ratio,  
                                     biomass),
                       climate_vars, by = "checklist_id") %>%
-  left_join(dplyr::select(nlcd_points, prop_forest, prop_decid, prop_conifer, prop_grass, checklist_id), by = "checklist_id") %>%
+  left_join(dplyr::select(nlcd_points, prop_forest, prop_decid, prop_conifer, prop_shrub, prop_grass, checklist_id), by = "checklist_id") %>%
   left_join(dplyr::select(oak_extract, prop_oak, checklist_id), by = "checklist_id") %>%
   left_join(dplyr::select(spruce_fir_extract, prop_spruce, checklist_id), by = "checklist_id") %>%
   left_join(slope_extract, by = "checklist_id") %>%
