@@ -24,6 +24,7 @@ predictor_stack_60 <- terra::rast("landis_predictor_layers/pred_stack_LowTLowV B
 pred_stack_orig <- terra::rast("predictor_layers/predictor_stack.grd") %>%
   terra::project(ecoregions) %>%
   mask(ecoregions, maskvalues = 1)
+# writeRaster(pred_stack_orig, "pred_stack_study_area.tif")
 
 preds <- terra::predict(object = predictor_stack_0, #pred_stack_orig, 
                         model = full_model,
