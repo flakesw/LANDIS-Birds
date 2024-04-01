@@ -47,3 +47,8 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# large files
+predictor_layers/
+ebird/
+predictor_stack.tif
