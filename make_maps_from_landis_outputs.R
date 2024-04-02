@@ -15,7 +15,7 @@ full_model <- readRDS("./models_for_landis/cerw_dist_model_full_landis.RDS")
 predictor_stack_0 <- terra::rast("landis_predictor_layers/pred_stack_LowTLowV BAU_0.tif")%>%
   terra::project(ecoregions) %>%
   mask(ecoregions, maskvalues = 1)
-predictor_stack_0$understory_ratio <- predictor_stack_0$understory_ratio * 12.8
+predictor_stack_0$understory_ratio <- 1 - predictor_stack_0$understory_ratio
 
 predictor_stack_60 <- terra::rast("landis_predictor_layers/pred_stack_LowTLowV BAU_60.tif")%>%
   terra::project(ecoregions) %>%
@@ -26,7 +26,7 @@ pred_stack_orig <- terra::rast("predictor_layers/predictor_stack.grd") %>%
   mask(ecoregions, maskvalues = 1)
 # writeRaster(pred_stack_orig, "pred_stack_study_area.tif")
 
-preds <- terra::predict(object = predictor_stack_0, #pred_stack_orig, 
+preds <- terra::predict(object = predictor_stack_60, 
                         model = full_model,
                         # ext = st_bbox(bcr_albers),
                         const = data.frame(time_observations_started = 7,
@@ -51,7 +51,7 @@ ggplot() +
   # geom_sf(data = bcr_albers, fill = NA) +
   labs(fill = "P(observation)")
 
-
+writeRaster(preds*255, "study_area_preds_cerw.tif", overwrite = TRUE)
 #just climate variables
 
 
