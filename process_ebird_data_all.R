@@ -6,23 +6,23 @@ library("lubridate")
 library("sf")
 
 #Make sure to change species *everywhere*!
-species <- "gwwa"
-species_long <- "gowwar"
-species_common <- "Golden-winged warbler"
+species <- "recr"
+species_long <- "redcro"
+species_common <- "Red crossbill"
 season_start <- "*-06-15"
 season_end <- "*-07-30"
+region <- "BCR28"
 scale <- NA #TODO add different spatial scales for aggregation
 
 #Data pre-treatment -------------------------------------------
 
 output_file <- paste0("./ebird/ebd_filtered_", species, ".txt")
-output_sampling <- paste0("./ebird/ebd_sampling_filtered", species, ".txt")
+output_sampling <- paste0("./ebird/ebd_sampling_filtered_", species, ".txt")
 f_ebd <- paste0("E:/ebird_data/ebd_US_relJan-2024.txt") 
 f_smp <- "E:/ebird_data/ebd_US_relJan-2024_sampling.txt"
 ebd_filters <-  auk_ebd(f_ebd, file_sampling = f_smp) %>% 
   auk_species(species_common, taxonomy_version = 2023) %>%
-  # auk_bcr(c(12,13,14,22,23,24,27,28,29,30)) %>%
-  auk_bcr(28) %>% #Just for Appalachian BCR
+  auk_bcr(ifelse(region == "BCR28", 28, c(12,13,14,22,23,24,27,28,29,30))) %>% #for just BCR28 or surrounding BCRs too?
   auk_complete() %>%
   auk_year(year = 2013:2022) %>%
   auk_date(date = c(season_start, season_end)) %>% 
@@ -67,49 +67,70 @@ ebird <- ebd_zf_df %>%
          time_observations_started, 
          duration_minutes, effort_distance_km,
          number_observers)
-# write_csv(ebird, paste0("./ebird/", species, "_filtered.csv"), na = "")
+write_csv(ebird, paste0("./ebird/", species, "_filtered.csv"), na = "")
 
 #-----------------------set up for GEE
 
-# ebird <- read.csv(paste0("./ebird/", species, "_filtered.csv"))
+ebird <- read.csv(paste0("./ebird/", species, "_filtered.csv"))
 
-ebird_sf <- ebird %>%
-  # convert to spatial points
-  dplyr::rename_with(tolower) %>%
-  sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
-  sf::st_transform(crs = 5070) %>%
-  dplyr::select(species_observed, checklist_id)
+# ebird_sf <- ebird %>%
+#   # convert to spatial points
+#   dplyr::rename_with(tolower) %>%
+#   sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
+#   sf::st_transform(crs = 5070) %>%
+#   dplyr::select(species_observed, checklist_id)
 
 
 #------------spatial thin
 library(dggridR)
 ##spatially thin to hex grid
 # generate hexagonal grid with 1.5 km between cells (half the maximum travel distance)
-dggs <- dgconstruct(spacing = 1.55)
+dggs_5 <- dgconstruct(spacing = 5)
+dggs_10 <- dgconstruct(spacing = 10)
 # get hexagonal cell id and week number for each checklist
 checklist_cell <- ebird %>%
-  mutate(cell = dgGEO_to_SEQNUM(dggs, longitude, latitude)$seqnum,
+  mutate(cell = dgGEO_to_SEQNUM(dggs_5, longitude, latitude)$seqnum,
          year = year(observation_date),
+         month = month(observation_date),
          week = week(observation_date))
-# sample one checklist per grid cell per week
+# checklist_cell_absence <- filter(ebird, !species_observed) %>%
+#   mutate(cell = dgGEO_to_SEQNUM(dggs_absences, longitude, latitude)$seqnum,
+#          year = year(observation_date),
+#          month = month(observation_date),
+#          week = week(observation_date))
+
+# sample one checklist per grid cell per month
 # sample detection/non-detection independently
 ebird_ss <- checklist_cell %>%
-  group_by(species_observed, year, week, cell) %>%
+  group_by(species_observed, year, month, cell) %>%
   sample_n(size = 1) %>%
   ungroup()
 
 # write.csv(ebird_ss, paste0("./ebird/", species, "_subsampled.csv"))
+# ebird_ss <- read.csv(paste0("./ebird/", species, "_subsampled.csv"))
 
 #------balance majority
 
 ebird_ss_bal <- ebird_ss %>%
   group_by(species_observed) %>%
   sample_n(size = sum(.$species_observed == TRUE))
-ebird_ss_sf <- ebird_sf %>%
-  filter(checklist_id %in% ebird_ss_bal$checklist_id)
-plot(ebird_ss_sf["species_observed"])
+# ebird_ss_sf <- ebird_sf %>%
+#   filter(checklist_id %in% ebird_ss_bal$checklist_id)
+# plot(ebird_ss_sf["species_observed"])
 
-write.csv(ebird_ss_bal, paste0("./ebird/", species, "_subsampled_balanced_bcr28.csv"))
+write.csv(ebird_ss_bal, paste0("./ebird/", species, "_subsampled_balanced_", region,"_", Sys.Date(), ".csv"))
+
+ebird_ss_true <- ebird_ss %>%
+  filter(species_observed == TRUE)
+ebird_ss_bal2 <- ebird_ss %>%
+  filter(species_observed == FALSE) %>%
+  sample_n(nrow(ebird_ss_true) * 10) %>%
+  bind_rows(ebird_ss_true)
+# ebird_ss_sf <- ebird_sf %>%
+#   filter(checklist_id %in% ebird_ss_bal$checklist_id)
+# plot(ebird_ss_sf["species_observed"])
+
+write.csv(ebird_ss_bal2, paste0("./ebird/", species, "_subsampled_balanced_extra_", region, ".csv"))
 
 # #figure -------------------------------------------------------
 # 

@@ -11,7 +11,7 @@ species <- "gwwa"
 ###### BRT
 data <- list.files("./environment_vars/", pattern = species, full.names = TRUE) %>%
   `[`(grep("combined", .))
-combined <- read.csv(data[1])
+combined <- read.csv(data[3])
 combined <- combined[complete.cases(combined), ] 
 # combined$species_observed <- ifelse(as.character(combined$species_observed) == "FOUND", TRUE, FALSE)
 brt <- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]), 

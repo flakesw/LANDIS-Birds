@@ -442,7 +442,7 @@ biomass <- list.files("predictor_layers", "biomass", full.names = TRUE) %>%
   terra::sprc() %>%
   terra::mosaic()  %>%
   `NAflag<-`(., value = -1) %>%
-  terra::aggregate(x = biomass2, fact = 10, fun = median, na.rm = TRUE) %>% 
+  terra::aggregate(fact = 10, fun = median, na.rm = TRUE) %>% 
   terra::focal(w=15, fun=median, na.policy="only", na.rm=T) %>%
   terra::project(template_raster)
 fhd_rast <- list.files("predictor_layers", "fhd", full.names = TRUE) %>%
@@ -463,6 +463,24 @@ height_rast <- list.files("predictor_layers", "rh95", full.names = TRUE) %>%
   terra::focal(w=15, fun=median, na.policy="only", na.rm=T) %>%
   terra::project(template_raster) %>%
   `/`(1000)
+
+count_open_cells <- 
+open_area_rast <- list.files("predictor_layers", "rh95", full.names = TRUE) %>%
+  lapply(terra::rast) %>%
+  terra::sprc() %>%
+  terra::mosaic() %>%
+  `NAflag<-`(., value = -1)%>%
+  `/`(1000) %>%
+  terra::aggregate(fact = 10, function(x){
+                                              x <- x[!is.na(x)]
+                                              ncells <- length(x)
+                                              cells_less_than_5 <- sum(x < 5)
+                                              return(cells_less_than_5 / ncells)
+                                            }) %>%
+  terra::focal(w=15, fun=median, na.policy="only", na.rm=T) %>%
+  terra::project(template_raster)
+  
+
 understory <- list.files("predictor_layers", "understory", full.names = TRUE) %>%
   lapply(terra::rast) %>%
   terra::sprc() %>%
@@ -513,6 +531,8 @@ forest_rast <- terra::rast("./predictor_layers/prop_forest.tiff")%>%
   terra::project(template_raster)
 decid_rast <- terra::rast("./predictor_layers/prop_decid.tiff")%>%
   terra::project(template_raster)
+conifer_rast <- terra::rast("./predictor_layers/prop_conifer.tiff")%>%
+  terra::project(template_raster)
 grass_shrub_rast <- terra::rast("./predictor_layers/prop_grass_shrub.tiff")%>%
   terra::project(template_raster)
 oak_rast <- terra::rast("./predictor_layers/prop_oak_fia.tiff")%>%
@@ -529,6 +549,7 @@ predictor_stack <- c(biomass,
                       understory,
                       fhd_rast,
                       height_rast,
+                      open_area_rast,
                       
                       aet_rast,
                       pet_rast,
@@ -545,6 +566,7 @@ predictor_stack <- c(biomass,
                       
                       forest_rast,
                       decid_rast,
+                      conifer_rast,
                       grass_shrub_rast,
                       oak_rast,
                       spruce_rast,
@@ -556,6 +578,7 @@ names(predictor_stack) <- c("biomass",
                             "understory_ratio",
                             "fhd_normal",
                             "height",
+                            "open_area",
                             
                             
                             "aet",
@@ -572,13 +595,14 @@ names(predictor_stack) <- c("biomass",
                             "slope",
                             
                             
-                            "prop_decid",
                             "prop_forest",
+                            "prop_decid",
+                            "prop_conifer",
                             "prop_grass", #TODO change name
                             "prop_oak",
                             "prop_spruce",
                             "prop_decid_fia")
 
 terra::writeRaster(predictor_stack, 
-                   "./predictor_layers/predictor_stack_bcr28.grd", 
+                   "./predictor_layers/predictor_stack_bcr28.tif", 
                    overwrite = TRUE)
