@@ -5,35 +5,42 @@ library("gbm")
 library("dismo")
 library("terra")
 library("sf")
+library("tidyterra")
 #--------------------------
 
 
-species <- "cerw"
+species <- "recr"
 
 ###### BRT
 data <- list.files("./environment_vars/", pattern = species, full.names = TRUE) %>%
-  `[`(grep("combined", .))
+  `[`(grep("combined", .)) 
 combined <- read.csv(data[1])
 combined <- combined[complete.cases(combined), ] 
 # combined$species_observed <- ifelse(as.character(combined$species_observed) == "FOUND", TRUE, FALSE)
-brt <- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]), 
+brt<- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]), 
                        gbm.x = c("aet", "pdsi", "pet", "soil", "tmmx", "tmmn", "vpd", "pr", "def", 
                                  "tpi", "chili", "slope", 
-                                 "height", "biomass", "fhd_normal", "understory_ratio",
-                                "prop_grass", "prop_decid",#"prop_conifer", "prop_spruce", "prop_oak", "prop_forest",  
+                                 "height", "biomass", "fhd_normal", "understory_ratio",# "open_area",
+                                "prop_grass", "prop_decid", "prop_conifer", "prop_spruce", "prop_oak", "prop_forest",  
                                  "time_observations_started", "duration_minutes"), #, "effort_radius_m"
                        gbm.y = "species_observed",
-                       interaction.depth = 2,
-                       cv_folds = 10)
+                       tree.complexity = 3,
+                       n.folds = 10)
+
 print(brt)
 summary.gbm(brt)
-gbm.interactions(brt)
-gbm.plot(brt)
-gbm.perspec(brt, x = 15, y = 17, theta = 210)
-gbm.perspec(brt, x = 12, y = 13)
-gbm.perf(brt)
+brt_int <- gbm.interactions(brt)
+gbm.plot(brt, n.plots = 9, plot.layout = c(3,3))
+gbm.perspec(brt, x = brt_int$rank.list$var1.index[1], y = brt_int$rank.list$var2.index[1], theta = 210)
+gbm.perspec(brt, x = brt_int$rank.list$var1.index[2], y = brt_int$rank.list$var2.index[2], theta = 135)
+gbm.perspec(brt, x = brt_int$rank.list$var1.index[3], y = brt_int$rank.list$var2.index[3], theta = 300)
+gbm.perspec(brt, x = brt_int$rank.list$var1.index[4], y = brt_int$rank.list$var2.index[4], theta = 300)
+gbm.perspec(brt, x = brt_int$rank.list$var1.index[5], y = brt_int$rank.list$var2.index[5], theta = 300)
+
 brt$self.statistics$discrimination
 brt$cv.statistics$discrimination.mean
+brt$cv.statistics$correlation.mean
+sqrt(mean(brt$residuals^2))
 roc(combined$species_observed, boot::inv.logit(predict(brt)),
     plot = TRUE)
 saveRDS(brt, paste0(species, "_dist_model_full.RDS"))
@@ -96,7 +103,7 @@ bcr_albers <- bcr %>%
   # st_transform(crs(ecoregions)) #%>%
   # st_crop(ecoregions) #
 
-predictor_stack <- terra::rast("predictor_layers/predictor_stack.grd") 
+predictor_stack <- terra::rast("predictor_layers/predictor_stack_bcr28.tif") 
 # predictor_stack[[c(2,3,4)]] <- predictor_stack[[c(2,3,4)]]/1000
 # predictor_stack[[c(4)]] <- predictor_stack[[c(4)]] #TODO check on this?
 # if(crs(predictor_stack) != crs(bcr_albers)) predictor_stack <- project(predictor_stack, bcr_albers)
@@ -118,13 +125,20 @@ preds <- terra::crop(preds, vect(bcr_albers), mask = TRUE)
 states <- sf::st_read("C:/Users/Sam/Documents/Maps/Basic maps/state boundaries/cb_2018_us_state_5m/cb_2018_us_state_5m.shp") %>%
   sf::st_transform(crs = crs(preds)) %>%
   st_crop(preds)
+ebd <- read.csv(paste0("./ebird/", species, "_subsampled_balanced_BCR28_2024-04-16.csv")) %>%
+  sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
+  sf::st_transform(crs = crs(preds))
+ebd$predicted <- terra::extract(preds, vect(ebd))$lyr1
+boxplot(ebd$predicted ~ ebd$species_observed)
 
 ggplot() +
   geom_spatraster(data = preds) +
   scale_fill_terrain_c() + 
   geom_sf(data = bcr_albers, fill = NA) +
   geom_sf(data = states, colour = alpha("black",0.5), fill = NA) +
-  labs(fill = "P(observation)")
+  labs(fill = "Habitat index") #+
+  # geom_sf(ebd, mapping = aes(color = species_observed))
+
 
 atlas_crs <- sf::st_read("./atlas/gwwa/BirdAtlas_6420.kml", layer = "Golden-Winged Warbler") %>%
   st_crs()
@@ -141,10 +155,10 @@ ggplot() +
   scale_fill_terrain_c() + 
   geom_sf(data = bcr_albers, fill = NA) +
   geom_sf(data = states, colour = alpha("black",0.5), fill = NA) +
-  labs(fill = "P(observation)")
+  labs(fill = "Habitat index")
 
 
-ebd_st <- terra::rast("./status_and_trends/gowwar_abundance_seasonal_breeding_max_2022.tif") %>%
+ebd_st <- terra::rast("./status_and_trends/redcro_abundance_seasonal_breeding_max_2022.tif") %>%
   terra::project(preds) %>%
   terra::crop(vect(bcr_albers), mask = TRUE) %>%
   terra::clamp(upper = 1)
@@ -157,9 +171,9 @@ ggplot() +
   scale_fill_terrain_c() +
   geom_sf(data = bcr_albers, fill = NA) +
   geom_sf(data = states, colour = alpha("black",0.5), fill = NA) +
-  labs(fill = "P(observation)")
+  labs(fill = "Habitat index")
 
-ebd_st <- ebd_st * (0.29/0.075)
+# ebd_st <- ebd_st * (0.29/0.075)
 atlas_current <- atlas_current * (mean(preds[], na.rm = TRUE) / mean(atlas_current[], na.rm = TRUE))
 
 error <- ebd_st - preds

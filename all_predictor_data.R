@@ -13,7 +13,7 @@ library("terra")
 #ee_install_upgrade()
 ee_Initialize(user = "swflake@ncsu.edu", drive = TRUE)
 
-species <- "gwwa"
+species <- "recr"
 
 bufferBy100 = function(feature) {
   feature$buffer(feature)
@@ -37,7 +37,7 @@ bcr_ee <- sf_as_ee(bcr)
 # bcr_ee$getInfo()
 # Map$addLayer(bcr_ee)
 
-ebird_ss <- read.csv(paste0("./ebird/", species, "_subsampled_balanced_bcr28.csv"))
+ebird_ss <- read.csv(paste0("./ebird/", species, "_subsampled_balanced_BCR28_2024-04-16.csv"))
 ebird_ss$month <- substr(ebird_ss$observation_date, 6, 7)
 
 ebird_ss <- ebird_ss %>% 
@@ -69,7 +69,7 @@ ee_print(aoi2)
 Map$addLayer(aoi2)
 
 
-predictor_stack <- terra::rast("./predictor_layers/predictor_stack.grd")
+predictor_stack <- terra::rast("./predictor_layers/predictor_stack_BCR28.tif")
 
 ## GEDI Level 2A product-----------------------------------------------------
 #just grab one of the relative height bands
@@ -80,6 +80,14 @@ ebird_buff_albers$height <- terra::extract(predictor_stack$height,
                                             )$height
 
 boxplot(ebird_buff_albers$height ~ ebird_buff_albers$species_observed)
+
+ebird_buff_albers$open_area<- terra::extract(predictor_stack$open_area, 
+                                           vect(ebird_buff_albers),
+                                           ID = FALSE,
+                                           fun = function(x) mean(x, na.rm = TRUE)
+                                           )$open_area
+
+boxplot(ebird_buff_albers$open_area~ ebird_buff_albers$species_observed)
 
 ##GEDI Level 2B products--------------------------------------------------------
 ebird_buff_albers$fhd_normal <- terra::extract(predictor_stack$fhd_normal, 
@@ -318,7 +326,8 @@ combined <- left_join(dplyr::select(ebird_buff_albers %>% st_drop_geometry(),
                                     height, 
                                     fhd_normal, 
                                     understory_ratio,  
-                                    biomass),
+                                    biomass,
+                                    open_area),
                       climate_vars, by = "checklist_id") %>%
   left_join(dplyr::select(nlcd_points, prop_forest, prop_decid, prop_conifer, prop_shrub, prop_grass, checklist_id), by = "checklist_id") %>%
   left_join(dplyr::select(oak_extract, prop_oak, checklist_id), by = "checklist_id") %>%
