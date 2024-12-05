@@ -52,3 +52,13 @@ rsconnect/
 predictor_layers/
 ebird/
 predictor_stack.tif
+validation data/bbs/2024Release_Nor/50-StopData/Fifty1.csv
+validation data/bbs/2024Release_Nor/50-StopData/Fifty10.csv
+validation data/bbs/2024Release_Nor/50-StopData/Fifty2.csv
+validation data/bbs/2024Release_Nor/50-StopData/Fifty3.csv
+validation data/bbs/2024Release_Nor/50-StopData/Fifty4.csv
+validation data/bbs/2024Release_Nor/50-StopData/Fifty5.csv
+validation data/bbs/2024Release_Nor/50-StopData/Fifty6.csv
+validation data/bbs/2024Release_Nor/50-StopData/fifty7.csv
+validation data/bbs/2024Release_Nor/50-StopData/Fifty8.csv
+validation data/bbs/2024Release_Nor/50-StopData/Fifty9.csv

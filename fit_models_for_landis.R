@@ -6,6 +6,9 @@ library("dismo")
 library("terra")
 library("sf")
 #--------------------------
+#Create bird habitat models to use with LANDIS-II outputs
+
+
 species <- "gwwa"
 
 ###### BRT
@@ -23,6 +26,9 @@ brt <- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]
                        gbm.y = "species_observed",
                        interaction.depth = 2,
                        cv_folds = 10)
+
+# brt <- readRDS(paste0("./models_for_landis/", species, "_dist_model_full_landis.RDS"))
+
 print(brt)
 summary.gbm(brt)
 gbm.interactions(brt)
@@ -110,7 +116,8 @@ preds <- terra::predict(object = predictor_stack, model = brt,
                         )
 values(preds) <- boot::inv.logit(values(preds))
 preds <- terra::crop(preds, vect(bcr_albers), mask = TRUE)
-# plot(preds)
+plot(preds)
+writeRaster(preds, paste0("./outputs/prediction_maps/original_", species, ".tiff"))
 
 #--------------------------
 # Make maps of predictions and validation layers

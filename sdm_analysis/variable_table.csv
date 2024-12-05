@@ -1,0 +1,26 @@
+var,short_name,long_name,Type,Color
+prop_decid,PropDecid,Proportion Deciduous,LandCover,#7fc97f
+vpd,VPD,Vapor Pressure Deficit,Climate,#beaed4
+tmmn,Tmin,Mean Minimum Summer Daily Temperature,Climate,#beaed4
+understory_ratio,Understory,Understory Ratio,GEDI,#f0027f
+duration_minutes,Duration,Duration,Effort,#fdc086
+prop_grass,PropGrass,Proportion Grass or Shrub,LandCover,#7fc97f
+tmmx,Tmax,Mean Maximum Summer Daily Temperature,Climate,#beaed4
+pdsi,PDSI,Palmer Drought Severity Index,Climate,#beaed4
+chili,CHILI,Continuous Heat-Insolation Load Index,Topo,#386cb0
+pet,PET,Potential evapotranspiration (reference evapotranspiration),Climate,#beaed4
+slope,Slope,Slope Steepness,Topo,#386cb0
+tpi,TPI,Topographic position index,Topo,#386cb0
+pr,PPT,Mean Summer Daily Precipitation,Climate,#beaed4
+time_observations_started,TimeStarted,Time observations started,Effort,#fdc086
+soil,SoilWat,Mean Summer Daily Soil Moisture,Climate,#beaed4
+height,Ht,Canopy Height,GEDI,#f0027f
+prop_forest,PropForest,Proportion Forested,LandCover,#7fc97f
+prop_oak,PropOak,Proportion of Basal Area in Oak,Inventory,#ffff99
+def,CWD,Climatic water deficit,Climate,#beaed4
+prop_spruce,PropSpruce,Proportion of Basal Area in Spruce and Fir,Inventory,#ffff99
+fhd_normal,FHD,Foliage Height Diversity,GEDI,#f0027f
+biomass,Biomass,Biomass,GEDI,#f0027f
+aet,AET,Actual evapotranspiration,Climate,#beaed4
+prop_conifer,PropConifer,Proportion Coniferous,LandCover,#7fc97f
+open_area,PropOpen,Proportion of area with height < 5m,GEDI,#f0027f

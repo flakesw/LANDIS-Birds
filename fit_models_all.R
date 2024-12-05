@@ -8,175 +8,194 @@ library("sf")
 library("tidyterra")
 #--------------------------
 
-
-species <- "recr"
+species <- "gwwa"
 
 ###### BRT
 data <- list.files("./environment_vars/", pattern = species, full.names = TRUE) %>%
-  `[`(grep("combined", .)) 
-combined <- read.csv(data[1])
-combined <- combined[complete.cases(combined), ] 
+  `[`(grep("combined", .)) %>%
+  `[`(c(5,11))
+combined <- map(data, read.csv)
+combined<- left_join(combined[[1]], combined[[2]])
+
+
 # combined$species_observed <- ifelse(as.character(combined$species_observed) == "FOUND", TRUE, FALSE)
-brt<- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]), 
-                       gbm.x = c("aet", "pdsi", "pet", "soil", "tmmx", "tmmn", "vpd", "pr", "def", 
-                                 "tpi", "chili", "slope", 
-                                 "height", "biomass", "fhd_normal", "understory_ratio",# "open_area",
-                                "prop_grass", "prop_decid", "prop_conifer", "prop_spruce", "prop_oak", "prop_forest",  
-                                 "time_observations_started", "duration_minutes"), #, "effort_radius_m"
+brt_all<- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]), 
+                       gbm.x = c("aet", "pdsi", "pet", "pr", "soil", "tmmx", "tmmn", "vpd", "def",
+                                 "Npp",
+                                 "tpi", "chili", "slope",
+                                 "height", "biomass", "fhd_normal", "understory_ratio", "open_area",
+                                 "prop_forest", "prop_decid", "prop_conifer","prop_shrub", "prop_grass",
+                                 "prop_water", "prop_dev_light", "prop_dev_heavy", "prop_open",
+                                "prop_spruce", "prop_oak",
+                                 "time_observations_started", "duration_minutes"), 
                        gbm.y = "species_observed",
-                       tree.complexity = 3,
+                       tree.complexity = 5,
+                       learning.rate = 0.01,
                        n.folds = 10)
 
-print(brt)
-summary.gbm(brt)
-brt_int <- gbm.interactions(brt)
-gbm.plot(brt, n.plots = 9, plot.layout = c(3,3))
-gbm.perspec(brt, x = brt_int$rank.list$var1.index[1], y = brt_int$rank.list$var2.index[1], theta = 210)
-gbm.perspec(brt, x = brt_int$rank.list$var1.index[2], y = brt_int$rank.list$var2.index[2], theta = 135)
-gbm.perspec(brt, x = brt_int$rank.list$var1.index[3], y = brt_int$rank.list$var2.index[3], theta = 300)
-gbm.perspec(brt, x = brt_int$rank.list$var1.index[4], y = brt_int$rank.list$var2.index[4], theta = 300)
-gbm.perspec(brt, x = brt_int$rank.list$var1.index[5], y = brt_int$rank.list$var2.index[5], theta = 300)
+print(brt_all)
+summary.gbm(brt_all)
+brt_int <- gbm.interactions(brt_all)
+gbm.plot(brt_all, n.plots = 9, plot.layout = c(3,3))
+gbm.perspec(brt_all, x = brt_int$rank.list$var1.index[1], y = brt_int$rank.list$var2.index[1], theta = 210)
 
-brt$self.statistics$discrimination
-brt$cv.statistics$discrimination.mean
-brt$cv.statistics$correlation.mean
-sqrt(mean(brt$residuals^2))
-roc(combined$species_observed, boot::inv.logit(predict(brt)),
-    plot = TRUE)
-saveRDS(brt, paste0(species, "_dist_model_full.RDS"))
+brt_all$self.statistics$discrimination
+brt_all$cv.statistics$discrimination.mean #mean(brt_all$cv.roc.matrix)
+brt_all$cv.statistics$correlation.mean
+sqrt(mean(brt_all$residuals^2))
+min(brt_all$train.error)
+
+roc(combined$species_observed, boot::inv.logit(predict(brt_all)),
+    plot = TRUE) #BRTs often overfit
+saveRDS(brt_all, paste0("./sdm_analysis/sdms/", species, "_dist_model_full.RDS"))
 
 
-brt_simp <- dismo::gbm.simplify(brt)
-plot(brt_simp$deviance.summary$mean ~ c(1:length(brt_simp$deviance.summary$mean)))
-brt2<- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]), 
-                       gbm.x = brt_simp$pred.list[[2]], #TODO get this automatically from the simp model
-                       gbm.y = "species_observed")
+# brt_simp <- dismo::gbm.simplify(brt_all)
+# plot(brt_simp$deviance.summary$mean ~ c(1:length(brt_simp$deviance.summary$mean)))
+# preds_selected <- brt_simp$pred.list[which(brt_simp$deviance.summary$mean == min(brt_simp$deviance.summary$mean))]
+# brt2<- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]), 
+#                        gbm.x = preds_selected, #TODO get this automatically from the simp model
+#                        gbm.y = "species_observed")
+# 
+# saveRDS(brt2, paste0("./sdm_analysis/sdms/", species, "_dist_model_simplified.RDS"))
+# 
+# 
+# gbm.plot(brt2,
+#          n.plots = 9,
+#          common.scale = TRUE,
+#          show.contrib = TRUE,
+#          plot.layout = c(3,3))
+# gbm.perspec(brt, x = 7, y = 6)
 
-saveRDS(brt2, paste0(species, "_dist_model_simplified.RDS"))
-
-
-gbm.plot(brt2,
-         n.plots = 9,
-         common.scale = TRUE,
-         show.contrib = TRUE,
-         plot.layout = c(3,3))
-gbm.perspec(brt, x = 7, y = 6)
-
+#----------------------
+# Just NLCD + Treemap
+#----------------------
 
 brt_veg <- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]), 
-                           gbm.x = c("deciduous", 
-                                     "biomass", "understory_ratio"),
-                           gbm.y = "species_observed")
+                           gbm.x = c("prop_forest", "prop_decid", "prop_conifer", "prop_shrub",
+                                     "prop_grass", "prop_oak", "prop_spruce",
+                                     "time_observations_started", "duration_minutes"),
+                           gbm.y = "species_observed",
+                           tree.complexity = 5,
+                           learning.rate = 0.01,
+                           n.folds = 10)
 summary.gbm(brt_veg)
 gbm.plot(brt_veg)
-# saveRDS(brt_veg, "cerw_dist_veg.RDS")
+brt_veg$self.statistics$discrimination
+brt_veg$cv.statistics$discrimination.mean #mean(brt_all$cv.roc.matrix)
+brt_veg$cv.statistics$correlation.mean
+sqrt(mean(brt_veg$residuals^2))
+min(brt_veg$train.error)
+saveRDS(brt_veg, paste0("./sdm_analysis/sdms/", species, "_dist_model_veg.RDS"))
+
+#----------------------
+# NLCD + Treemap + GEDI
+#----------------------
+
+brt_veg_gedi <- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]), 
+                           gbm.x = c("height", "fhd_normal", "understory_ratio", "biomass", "open_area",
+                                      "prop_forest", "prop_decid", "prop_conifer", "prop_shrub",
+                                     "prop_grass", "prop_oak", "prop_spruce",
+                                     "time_observations_started", "duration_minutes"),
+                           gbm.y = "species_observed",
+                           tree.complexity = 5,
+                           learning.rate = 0.01,
+                           n.folds = 10)
+summary.gbm(brt_veg_gedi)
+gbm.plot(brt_veg_gedi)
+brt_veg_gedi$self.statistics$discrimination
+brt_veg_gedi$cv.statistics$discrimination.mean #mean(brt_all$cv.roc.matrix)
+brt_veg_gedi$cv.statistics$correlation.mean
+sqrt(mean(brt_veg_gedi$residuals^2))
+min(brt_veg_gedi$train.error)
+saveRDS(brt_veg_gedi, paste0("./sdm_analysis/sdms/", species, "_dist_model_veg_gedi.RDS"))
+
+#-------------------------------------
+# Topography and climate
+#---------------------------------------
 
 brt_clim <- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]), 
-                            gbm.x = c("tmmn", "pr", "tmmx", "tpi", "chili"),
-                            gbm.y = "species_observed")
+                            gbm.x = c("pdsi", "pet", "pr", "soil", "tmmn", 
+                                      "tmmx", "vpd", "def", "tpi", "chili", "slope",
+                                      "time_observations_started", "duration_minutes"),
+                            gbm.y = "species_observed",
+                            tree.complexity = 5,
+                            learning.rate = 0.01,
+                            n.folds = 10)
 summary.gbm(brt_clim)
 gbm.plot(brt_clim)
-# saveRDS(brt_clim, "cerw_dist_clim.RDS")
+brt_clim$self.statistics$discrimination
+brt_clim$cv.statistics$discrimination.mean #mean(brt_all$cv.roc.matrix)
+brt_clim$cv.statistics$correlation.mean
+sqrt(mean(brt_clim$residuals^2))
+min(brt_clim$train.error)
+saveRDS(brt_clim, paste0("./sdm_analysis/sdms/", species, "_dist_model_clim.RDS"))
 
-brt_reduced <- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]), 
-                            gbm.x = c("biomass", "understory_ratio", "prop_decid",
-                                      "tmmx", "tmmn", "pr", "chili", "tpi",
+#-------------------------------------
+# Topography and climate + GEDI
+#---------------------------------------
+
+brt_clim_gedi <- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]), 
+                            gbm.x = c("height", "fhd_normal", "understory_ratio", "biomass",
+                                      "pdsi", "pet", "pr", "soil", "tmmn", 
+                                      "tmmx", "vpd", "def", "tpi", "chili", "slope",
                                       "time_observations_started", "duration_minutes"),
-                            gbm.y = "species_observed")
-summary.gbm(brt_reduced)
-gbm.plot(brt_reduced)
+                            gbm.y = "species_observed",
+                            tree.complexity = 5,
+                            learning.rate = 0.01,
+                            n.folds = 10)
+summary.gbm(brt_clim_gedi)
+gbm.plot(brt_clim_gedi)
+brt_clim_gedi$self.statistics$discrimination
+brt_clim_gedi$cv.statistics$discrimination.mean #mean(brt_all$cv.roc.matrix)
+brt_clim_gedi$cv.statistics$correlation.mean
+sqrt(mean(brt_clim_gedi$residuals^2))
+min(brt_clim_gedi$train.error)
+saveRDS(brt_clim_gedi, paste0("./sdm_analysis/sdms/", species, "_dist_model_clim_gedi.RDS"))
 
 
-# saveRDS(brt_reduced, "cerw_dist_test.RDS")
+#-------------------------------------------------------
+# All without GEDI
+#--------------------------------------------------------
+brt_all_no_gedi<- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]), 
+                          gbm.x = c("aet", "pdsi", "pet", "soil", "tmmx", "tmmn", "vpd", "pr", "def",
+                                    "tpi", "chili", "slope",
+                                    #"height", "biomass", "fhd_normal", "understory_ratio", "open_area",
+                                    "prop_grass", "prop_decid", "prop_conifer", "prop_spruce", "prop_oak", "prop_forest",
+                                    "time_observations_started", "duration_minutes"), 
+                          gbm.y = "species_observed",
+                          tree.complexity = 5,
+                          learning.rate = 0.01,
+                          n.folds = 10)
 
-## make maps ------------------------------------
-ecoregions <- terra::rast("C:/Users/Sam/Documents/Research/Project-Southern-Appalachians-2018/Models/LANDIS_Sapps_Ecosystem_Papers/Ecos11_NCLD.tif")
+summary.gbm(brt_all_no_gedi)
+gbm.plot(brt_all_no_gedi)
+brt_all_no_gedi$self.statistics$discrimination
+brt_all_no_gedi$cv.statistics$discrimination.mean #mean(brt_all$cv.roc.matrix)
+brt_all_no_gedi$cv.statistics$correlation.mean
+sqrt(mean(brt_all_no_gedi$residuals^2))
+min(brt_all_no_gedi$train.error)
 
-bcr <- sf::st_read("./maps/BCR_NA.shp") %>%
-  sf::st_transform("EPSG:4326")%>%
-  filter(BCR == 28) %>%
-  sf::st_make_valid() %>%
-  dplyr::select("BCR")
+saveRDS(brt_all_no_gedi, paste0("./sdm_analysis/sdms/", species, "_dist_model_full_no_gedi.RDS"))
 
-bcr_albers <- bcr %>% 
-  st_transform("EPSG:5070")
-  # st_transform(crs(ecoregions)) #%>%
-  # st_crop(ecoregions) #
+#-------------------------------------------------------
+# GEDI only
+#--------------------------------------------------------
+brt_gedi<- dismo::gbm.step(data = as.data.frame(combined[complete.cases(combined), ]), 
+                                  gbm.x = c("height", "biomass", "fhd_normal", "understory_ratio", # "open_area",
+                                            "time_observations_started", "duration_minutes"), 
+                                  gbm.y = "species_observed",
+                                  tree.complexity = 5,
+                                  learning.rate = 0.01,
+                                  n.folds = 10)
 
-predictor_stack <- terra::rast("predictor_layers/predictor_stack_bcr28.tif") 
-# predictor_stack[[c(2,3,4)]] <- predictor_stack[[c(2,3,4)]]/1000
-# predictor_stack[[c(4)]] <- predictor_stack[[c(4)]] #TODO check on this?
-# if(crs(predictor_stack) != crs(bcr_albers)) predictor_stack <- project(predictor_stack, bcr_albers)
+summary.gbm(brt_gedi)
+gbm.plot(brt_gedi)
+brt_gedi$self.statistics$discrimination
+brt_gedi$cv.statistics$discrimination.mean #mean(brt_all$cv.roc.matrix)
+brt_gedi$cv.statistics$correlation.mean
+sqrt(mean(brt_gedi$residuals^2))
+min(brt_gedi$train.error)
 
-names(predictor_stack)
+saveRDS(brt_gedi, paste0("./sdm_analysis/sdms/", species, "_dist_model_full_gedi_only.RDS"))
 
-preds <- terra::predict(object = predictor_stack, model = brt,
-                        ext = st_bbox(bcr_albers),
-                        const = data.frame(time_observations_started = 10,
-                                           duration_minutes = 60,
-                                           effort_radius_m = 1000)
-                        )
-values(preds) <- boot::inv.logit(values(preds))
-preds <- terra::crop(preds, vect(bcr_albers), mask = TRUE)
-# plot(preds)
-
-#--------------------------
-# Make maps of predictions and validation layers
-states <- sf::st_read("C:/Users/Sam/Documents/Maps/Basic maps/state boundaries/cb_2018_us_state_5m/cb_2018_us_state_5m.shp") %>%
-  sf::st_transform(crs = crs(preds)) %>%
-  st_crop(preds)
-ebd <- read.csv(paste0("./ebird/", species, "_subsampled_balanced_BCR28_2024-04-16.csv")) %>%
-  sf::st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
-  sf::st_transform(crs = crs(preds))
-ebd$predicted <- terra::extract(preds, vect(ebd))$lyr1
-boxplot(ebd$predicted ~ ebd$species_observed)
-
-ggplot() +
-  geom_spatraster(data = preds) +
-  scale_fill_terrain_c() + 
-  geom_sf(data = bcr_albers, fill = NA) +
-  geom_sf(data = states, colour = alpha("black",0.5), fill = NA) +
-  labs(fill = "Habitat index") #+
-  # geom_sf(ebd, mapping = aes(color = species_observed))
-
-
-atlas_crs <- sf::st_read("./atlas/gwwa/BirdAtlas_6420.kml", layer = "Golden-Winged Warbler") %>%
-  st_crs()
-atlas_current <- terra::rast("./atlas/gwwa/models/cur.png")[[1]]
-ext(atlas_current) <- c(-112.993023, -58.990946, 19.066954, 54.427486)
-crs(atlas_current) <- atlas_crs$wkt
-atlas_current <- (255 - atlas_current)/255
-atlas_current <- terra::project(atlas_current, preds) %>%
-  terra::crop(bcr_albers, mask = TRUE)
-# plot(atlas_current)
-
-ggplot() +
-  geom_spatraster(data = atlas_current) +
-  scale_fill_terrain_c() + 
-  geom_sf(data = bcr_albers, fill = NA) +
-  geom_sf(data = states, colour = alpha("black",0.5), fill = NA) +
-  labs(fill = "Habitat index")
-
-
-ebd_st <- terra::rast("./status_and_trends/redcro_abundance_seasonal_breeding_max_2022.tif") %>%
-  terra::project(preds) %>%
-  terra::crop(vect(bcr_albers), mask = TRUE) %>%
-  terra::clamp(upper = 1)
-  # `/`(max(.[], na.rm = TRUE))
-  # terra::classify(rcl = c(0, 1, Inf))
-  
-# plot(ebd_st)
-ggplot() +
-  geom_spatraster(data = ebd_st*2.5) +
-  scale_fill_terrain_c() +
-  geom_sf(data = bcr_albers, fill = NA) +
-  geom_sf(data = states, colour = alpha("black",0.5), fill = NA) +
-  labs(fill = "Habitat index")
-
-# ebd_st <- ebd_st * (0.29/0.075)
-atlas_current <- atlas_current * (mean(preds[], na.rm = TRUE) / mean(atlas_current[], na.rm = TRUE))
-
-error <- ebd_st - preds
-error <- atlas_current - preds
-plot(error)
-hist(error)
