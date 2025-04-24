@@ -62,3 +62,7 @@ validation data/bbs/2024Release_Nor/50-StopData/Fifty6.csv
 validation data/bbs/2024Release_Nor/50-StopData/fifty7.csv
 validation data/bbs/2024Release_Nor/50-StopData/Fifty8.csv
 validation data/bbs/2024Release_Nor/50-StopData/Fifty9.csv
+/environment_vars/gee_temp
+/environment_vars/old_local
+/environment_vars/local
+/sdm_analysis/sdms
