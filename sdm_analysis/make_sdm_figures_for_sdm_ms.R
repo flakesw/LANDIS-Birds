@@ -37,8 +37,6 @@ states <- sf::st_read("C:/Users/Sam/Documents/Maps/Basic maps/state boundaries/c
   sf::st_transform(crs = crs(preds)) %>%
   st_crop(preds)
 
-predictor_stack <- terra::rast("predictor_layers/predictor_stack_bcr28.tif") 
-
 #---------------------------------------------------
 # partial effects
 #---------------------------------------------------

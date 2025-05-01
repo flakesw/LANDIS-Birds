@@ -13,14 +13,13 @@ library("tidyterra")
 
 # species_list <- c("cerw", "gwwa")
 
-species_list <- c("bcch", "blbw", "bwwa", "cerw",
-                  "ewpw", "gwwa", "heth",
-                  "kewa", "lowa", "nawa", "nswo",
-                  "oven", "praw", "prow", "recr",
-                  "rugr", "swwa", "veer", "wewa",
-                  "woth", "ytwa")
+# species_list <- c("bcch",   "cerw", "gwwa", "heth", "kewa", "lowa", "ytwa",
+                    # "praw", "prow", "recr", "swwa", "veer", "wewa",
+                    # "ewpw", "rugr", "nswo",  "acfl", "alfl", "bhnu")
 
-not_enough_data <- c("evgr") 
+
+# not_enough_data <- c("evgr", "osfl")
+
 
 for(species in species_list){
   models_all <- tibble(names = character(length = 0L),
@@ -59,6 +58,7 @@ for(species in species_list){
                       models = model_list)
   models_all <- bind_rows(models_all, model_tib)
   
-  saveRDS(models_all, file = paste0("./sdm_analysis/sdms/", species, "full_model_landis_v1.RDS"))
+  saveRDS(models_all, file = paste0("./sdm_analysis/sdms/", species, "_all_scales_full_model.RDS"))
   
 }
+

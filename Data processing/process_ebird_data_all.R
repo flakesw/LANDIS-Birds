@@ -8,18 +8,23 @@ library("dggridR")
 
 # ebird_taxonomy <- read.csv("E:/ebird_data/Clements-v2023-October-2023.csv")
 banding_codes <- read.csv("./bird_info/banding_codes.csv")
-species_data <- data.frame(species = character(22))
+species_data <- data.frame(species = character(4))
 
-#which species to use?
-species_data$species <- c("bcch", "ewpw", "evgr", "recr", "wewa",
-                          "swwa", "nawa", "lowa", "prow", "cerw",
-                          "kewa", "praw", "ytwa", "blbw", "gwwa",
-                          "rugr", "nswo", "veer", "heth", "oven",
-                          "bwwa", "woth")
+# #which species to use?
+# species_data$species <- c("bcch", "ewpw", "evgr", "recr", "wewa",
+#                           "swwa", "nawa", "lowa", "prow", "cerw",
+#                           "kewa", "praw", "ytwa", "blbw", "gwwa",
+#                           "rugr", "nswo", "veer", "heth", "oven",
+#                           "bwwa", "woth")
+# species_data$species_common <- banding_codes[match(species_data$species, tolower(banding_codes$Alpha.Code)), "Common.Name"]
+# species_data$species_scientific <- banding_codes[match(species_data$species, tolower(banding_codes$Alpha.Code)), "Scientific.Name"]
+# species_data$species_common[16] <- "Ruffed Grouse"
+# species_data$species_scientific[16] <- "Bonasa umbellus"
+
+species_data$species <- c("acfl", "alfl", "bhnu", "osfl")
 species_data$species_common <- banding_codes[match(species_data$species, tolower(banding_codes$Alpha.Code)), "Common.Name"]
 species_data$species_scientific <- banding_codes[match(species_data$species, tolower(banding_codes$Alpha.Code)), "Scientific.Name"]
-species_data$species_common[16] <- "Ruffed Grouse"
-species_data$species_scientific[16] <- "Bonasa umbellus"
+
 season_start <- "*-06-15"
 season_end <- "*-07-30"
 region <- "BCR28"
@@ -91,6 +96,7 @@ write_csv(ebird, paste0("./ebird/all_species_filtered.csv"), na = "")
 # generate hexagonal grid with 3.1 km between cells (maximum travel distance)
 # or spatial scale if it's larger than 3.1
 dggs <- dgconstruct(spacing = ifelse(scale > 3.1, scale, 3.1))
+dggs <-  dgconstruct(spacing = 3.1)
 # dggs_10 <- dgconstruct(spacing = 10)
 # get hexagonal cell id and week number for each checklist
 checklist_cell <- ebird %>%

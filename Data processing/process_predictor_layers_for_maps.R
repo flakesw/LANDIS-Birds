@@ -222,6 +222,15 @@ prop_hardwood <- terra::rast("./predictor_layers/prop_hardwood_fia.tiff") %>%
   terra::project(template_raster)
 
 
+
+#---------------
+# MODIS NPP
+#-----------------
+npp_rast <- list.files("predictor_layers", "npp", full.names = TRUE)%>%
+  terra::rast() %>%
+  terra::project(template_raster)
+plot(npp_rast)
+
 #------------------------
 #layers for gbm predictions
 predictor_stack <- c(biomass_agg,
@@ -254,7 +263,9 @@ predictor_stack <- c(biomass_agg,
                      prop_open,
                      prop_oak,
                      prop_spruce,
-                     prop_hardwood
+                     prop_hardwood,
+                     
+                     npp_rast
 )
 
 
@@ -289,8 +300,11 @@ names(predictor_stack) <- c("biomass",
                             "prop_open",
                             "prop_oak",
                             "prop_spruce",
-                            "prop_hardwood")
+                            "prop_hardwood",
+                            
+                            "npp")
 
 terra::writeRaster(predictor_stack, 
                    "./predictor_layers/predictor_stack_bcr28.tif", 
                    overwrite = TRUE)
+

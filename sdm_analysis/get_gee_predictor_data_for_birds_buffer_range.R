@@ -11,17 +11,18 @@ library("stars")
 library("starsExtra")
 library("terra")
 #ee_install()
-#ee_install_upgrade()
-ee_Initialize(user = "swflake@ncsu.edu", drive = TRUE)
+# ee_install_upgrade()
+# ee_Authenticate()
+ee_Initialize(user = "sflake@gmail.com", drive = TRUE, 
+              project = "zinc-envelope-436017-g7")
 
-species_list <- c(
-"oven", "woth") #ovenbird and wood thrush need everything
+# species_list <- c(
+# "oven", "woth") #ovenbird and wood thrush need everything
+species_list <- c("acfl")#, "alfl", "bhnu", "osfl")
 
 #what scales to extract data for?
-scale_range <- c("effort", 100, 500, 1000, 5000, 10000)
-# scale_range <- "effort"
-# scale_range <- c(100, 500, 1000, 5000, 10000)
-
+scale_range <- c(10000)
+# "effort", 100, 500, 
 
 bufferBy100 = function(feature) {
   feature$buffer(feature)

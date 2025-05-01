@@ -4,12 +4,14 @@ library("tidyverse")
 # species_list <- c("cerw", "gwwa")
 
 #full species list
-species_list <- c("bcch", "blbw", "bwwa", "cerw",
-                  "evgr", "ewpw", "gwwa", "heth",
-                  "kewa", "lowa", "nawa", "nswo",
-                  "oven", "praw", "prow", "recr",
-                  "rugr", "swwa", "veer", "wewa",
-                  "woth", "ytwa")
+# species_list <- c("bcch", "blbw", "bwwa", "cerw",
+#                   "evgr", "ewpw", "gwwa", "heth",
+#                   "kewa", "lowa", "nawa", "nswo",
+#                   "oven", "praw", "prow", "recr",
+#                   "rugr", "swwa", "veer", "wewa",
+#                   "woth", "ytwa")
+
+species_list <- c("acfl") #, "alfl", "bhnu", "osfl")
 
 #some helper functions
 read_plus <- function(flnm) {

@@ -42,7 +42,7 @@ for(i in 1:length(mods)){
   for(j in 1:nrow(mod_list)){
     
     modname <- mod_list[[1]][j]
-    mod1 <- mod_list[[2]][j]
+    mod1 <- mod_list[[2]][[j]]
     
     preds <- terra::predict(object = predictor_stack, model = mod1,
                             ext = st_bbox(bcr_albers),
@@ -54,6 +54,6 @@ for(i in 1:length(mods)){
     values(preds) <- boot::inv.logit(values(preds))
     preds <- terra::crop(preds, vect(bcr_albers), mask = TRUE)
     plot(preds)
-    writeRaster(preds, paste0("./sdm_analysis/outputs/prediction_maps/", modname, ".tiff"))
+    writeRaster(preds, paste0("./sdm_analysis/outputs/prediction_maps/", modname, ".tiff"), overwrite = TRUE)
   }
 }

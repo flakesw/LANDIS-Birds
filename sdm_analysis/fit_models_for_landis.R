@@ -13,16 +13,12 @@ library("tidyterra")
 
 # species_list <- c("cerw", "gwwa")
 
-species_list <- c("bcch", "blbw", "bwwa", "cerw",
-                  "ewpw", "gwwa", "heth",
-                  "kewa", "lowa", "nawa", "nswo",
-                  "oven", "praw", "prow", "recr",
-                  "rugr", "swwa", "veer", "wewa",
-                  "woth", "ytwa")
+species_list <- c("bcch", "blbw",  "cerw", "gwwa", "heth", "kewa", "lowa",
+                   "praw", "prow", "recr", "swwa", "veer", "wewa","ytwa",
+                  "ewpw", "rugr", "nswo",  "acfl", "alfl", "bhnu")
 
-scale_select <- "effort"
+scale_select <- 500
 
-not_enough_data <- c("evgr") 
 
 for(species in species_list){
   models_all <- tibble(names = character(length = 0L),
@@ -42,8 +38,8 @@ for(species in species_list){
       filter(unique == combos[i])
     brt_all<- dismo::gbm.step(data = as.data.frame(data_subset[complete.cases(data_subset), ]), 
                               gbm.x = c("aet", "pet", "pr", "soil", "tmmx", "tmmn", # "vpd", "def", "pdsi",
-                                        "tpi", "chili", "slope",
-                                        "height", "biomass", "fhd", "understory", "area_short",
+                                        "tpi", "chili", "slope", #"Npp",
+                                        "height", "biomass", "fhd", "area_short", "understory", 
                                         "prop_forest", #"prop_decid", "prop_conifer", "prop_shrub", "prop_grass",
                                         #"prop_water", "prop_dev_heavy", "prop_open", "prop_dev_light"
                                         "prop_spruce", "prop_oak", "prop_hardwood",
@@ -62,6 +58,6 @@ for(species in species_list){
                       models = model_list)
   models_all <- bind_rows(models_all, model_tib)
   
-  saveRDS(models_all, file = paste0("./sdm_analysis/sdms/", species, "full_model_landis_v1.RDS"))
+  saveRDS(models_all, file = paste0("./sdm_analysis/sdms/", species, "full_model_landis_v2.RDS"))
   
 }

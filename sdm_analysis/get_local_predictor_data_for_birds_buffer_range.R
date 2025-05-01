@@ -23,13 +23,18 @@ extract_sample <- function(x, max_shots = 100){
 
 #-------------------------
 
-species_list <- c(#"cerw", "gwwa", "recr", "swwa", "bwwa", 
-                  "blbw",
-                  "bcch", "ewpw", "evgr", "wewa",
-                  "nawa", "lowa", "prow",
-                  "kewa", "praw", "ytwa",
-                  "rugr", "nswo", "veer", "heth", "oven",
-                  "woth")
+# species_list <- c(#"cerw", "gwwa", "recr", "swwa", "bwwa", 
+#                   "blbw",
+#                   "bcch", "ewpw", "evgr", "wewa",
+#                   "nawa", "lowa", "prow",
+#                   "kewa", "praw", "ytwa",
+#                   "rugr", "nswo", "veer", "heth", "oven",
+#                   "woth", "alfl", "bhnu", "osfl")
+
+species_list <- c("acfl")
+
+# "acfl" -- needs scale 1000 and 5000
+
 # buffer_scale <- "effort"
 # buffer_scale <- 10000
 
@@ -73,7 +78,8 @@ for(species in species_list){
   ebird_ss$group <- floor(seq(0, (nrow(ebird_ss)-1))/500) + 1
   
   
-  scale_range <- c("effort", 100, 500, 1000, 5000, 10000)
+  # scale_range <- c("effort", 100, 500, 1000, 5000, 10000)
+  scale_range <- c(1000)
   
   for(buffer_scale in scale_range){
     print(paste0("Running script for species ", species, " at scale ", buffer_scale))
