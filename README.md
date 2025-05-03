@@ -1,0 +1,3 @@
+This repository contains code, inputs, and data products for the project, "Climate adaptive forest management for breeding bird habitat in the southern Appalachians", funded by the USGS Southeast Climate Adaptation Science Center. Analysis was performed by Sam Flake. Please contact Sam at swflake@ncsu.edu or sflake@gmail.com with questions.
+
+These data are marked with a Creative Common CC0 1.0 Universal License. These data are in the public domain and do not have any use constraints. Users are advised to read the dataset's metadata thoroughly to understand appropriate use and data limitations.
