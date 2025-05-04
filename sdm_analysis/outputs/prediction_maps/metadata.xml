@@ -1,0 +1,709 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--Record created using version 2.1.0 of the USGS Metadata Wizard tool. (https://github.com/DOI-USGS/fort-pymdwizard)-->
+<metadata>
+  <idinfo>
+    <citation>
+      <citeinfo>
+        <origin>Samuel W. Flake, North Carolina State University</origin>
+        <pubdate>20250501</pubdate>
+        <title>Predicted distributions of Appalachian bird species of conservation concern, circa 2023	</title>
+        <edition>1.0</edition>
+        <geoform>raster digital data</geoform>
+        <pubinfo>
+          <pubplace>Raleigh, NC</pubplace>
+          <publish>North Carolina State University</publish>
+        </pubinfo>
+      </citeinfo>
+    </citation>
+    <descript>
+      <abstract>This dataset provides predicted occurrence of several bird species of conservation concern in the Appalachian Mountains, USA. Predictions were created from species distribution models trained on eBird data and using a suite of topographic, climatic, and vegetation variables, including spaceborne LiDAR. For each species, we created SDMs and predictions for a range of spatial scales (ranging from 100 m to 10 km), aggregating all of the predictor data within a buffer of that radius around each observation point. Each raster maps the class-balanced encounter rate (not species occupancy), controlling for observer effort. </abstract>
+      <purpose>The data were collected to validate SDM models and to provide initial data for comparison to forecasted bird habitat generated from a forest landscape model. The data may be used for estimating habitat quality for these species, for comparison to other model structures, or for comparing the influence of spatial scale on predicted bird </purpose>
+    </descript>
+    <timeperd>
+      <timeinfo>
+        <sngdate>
+          <caldate>20230701</caldate>
+        </sngdate>
+      </timeinfo>
+      <current>See Supplemental Info</current>
+    </timeperd>
+    <status>
+      <progress>Complete</progress>
+      <update>As needed</update>
+    </status>
+    <spdom>
+      <descgeog>Bird Conservation Region 28</descgeog>
+      <bounding>
+        <westbc>-83.7598</westbc>
+        <eastbc>-72.5098</eastbc>
+        <northbc>42.1634</northbc>
+        <southbc>33.3213</southbc>
+      </bounding>
+    </spdom>
+    <keywords>
+      <theme>
+        <themekt>ISO 19115 Topic Category</themekt>
+        <themekey>biota</themekey>
+      </theme>
+      <theme>
+        <themekt>USGS Thesaurus</themekt>
+        <themekey>birds</themekey>
+        <themekey>biogeography</themekey>
+        <themekey>maps and atlases</themekey>
+      </theme>
+      <place>
+        <placekt>None</placekt>
+        <placekey>Appalachia</placekey>
+        <placekey>Appalachian Mountains</placekey>
+        <placekey>Bird Conservation Region 28</placekey>
+      </place>
+    </keywords>
+    <taxonomy>
+      <keywtax>
+        <taxonkt>birds</taxonkt>
+        <taxonkey>birds</taxonkey>
+        <taxonkey>aves</taxonkey>
+      </keywtax>
+      <taxoncl>
+        <taxonrn>Kingdom</taxonrn>
+        <taxonrv>Aves</taxonrv>
+        <common>Birds</common>
+      </taxoncl>
+    </taxonomy>
+    <accconst>No access constraints. Please see 'Distribution Information' for details.</accconst>
+    <useconst>These data are marked with a Creative Common CC0 1.0 Universal License. These data are in the public domain and do not have any use constraints. Users are advised to read the dataset's metadata thoroughly to understand appropriate use and data limitations.</useconst>
+    <ptcontac>
+      <cntinfo>
+        <cntperp>
+          <cntper>Samuel W. Flake</cntper>
+          <cntorg>North Carolina State University</cntorg>
+        </cntperp>
+        <cntpos>Postdoctoral scholar</cntpos>
+        <cntaddr>
+          <addrtype>mailing</addrtype>
+          <address>North Carolina State University</address>
+          <city>Raleigh</city>
+          <state>NC</state>
+          <postal>27695</postal>
+        </cntaddr>
+        <cntvoice>336-944-1198</cntvoice>
+        <cntemail>swflake@ncsu.edu</cntemail>
+      </cntinfo>
+    </ptcontac>
+    <native>R version 4.2.0 (2022-04-22 ucrt)
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+Running under: Windows 10 x64 (build 19045)
+
+R packages:
+gbm_2.1.8.1     dismo_1.3-9     raster_3.6-11   sp_1.5-1        forcats_0.5.1   stringr_1.5.0  
+dplyr_1.1.2     purrr_1.0.1     readr_2.1.2     tidyr_1.3.0     tibble_3.2.1    ggplot2_3.5.1  
+tidyverse_1.3.2 sf_1.0-19       terra_1.6-47  </native>
+  </idinfo>
+  <dataqual>
+    <attracc>
+      <attraccr>Accuracy was evaluated using cross-validated AUC (area under the curve of the receiver operating characteristic curve). </attraccr>
+    </attracc>
+    <logic>Predicted encounter rates range between 0 and 1, and visually align with expected species ranges. Data are statistically correlated with other bird distribution products (BBS, Climate Change Bird Atlas, eBird Status and Trends)</logic>
+    <complete>The data represent encounter rates fit for climate data from 2023 and vegetation data from 2014-2023, depending upon the data product.</complete>
+    <lineage>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>Brian L. Sullivan</origin>
+            <origin>Christopher L. Wood</origin>
+            <origin>Marshall J. Iliff</origin>
+            <origin>Rick E. Bonney</origin>
+            <origin>Daniel Fink</origin>
+            <origin>Steve Kelling</origin>
+            <pubdate>200910</pubdate>
+            <title>eBird: A citizen-based bird observation network in the biological sciences</title>
+            <geoform>vector digital data</geoform>
+            <serinfo>
+              <sername>Biological Conservation</sername>
+              <issue>vol. 142, issue 10</issue>
+            </serinfo>
+            <pubinfo>
+              <pubplace>n/a</pubplace>
+              <publish>Elsevier BV</publish>
+            </pubinfo>
+            <othercit>ppg. 2282-2292</othercit>
+            <onlink>https://doi.org/10.1016/j.biocon.2009.05.006</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>20130615</begdate>
+              <enddate>20230730</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>publication date</srccurr>
+        </srctime>
+        <srccitea>eBird</srccitea>
+        <srccontr>Bird presences and absences to train species distribution model</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>Ralph Dubayah</origin>
+            <origin>James Bryan Blair</origin>
+            <origin>Scott Goetz</origin>
+            <origin>Lola Fatoyinbo</origin>
+            <origin>Matthew Hansen</origin>
+            <origin>Sean Healey</origin>
+            <origin>Michelle Hofton</origin>
+            <origin>George Hurtt</origin>
+            <origin>James Kellner</origin>
+            <origin>Scott Luthcke</origin>
+            <origin>John Armston</origin>
+            <origin>Hao Tang</origin>
+            <origin>Laura Duncanson</origin>
+            <origin>Steven Hancock</origin>
+            <origin>Patrick Jantz</origin>
+            <origin>Suzanne Marselis</origin>
+            <origin>Paul L. Patterson</origin>
+            <origin>Wenlu Qi</origin>
+            <origin>Carlos Silva</origin>
+            <pubdate>202006</pubdate>
+            <title>The Global Ecosystem Dynamics Investigation: High-resolution laser ranging of the Earth’s forests and topography</title>
+            <geoform>raster digital data</geoform>
+            <serinfo>
+              <sername>Science of Remote Sensing</sername>
+              <issue>vol. 1</issue>
+            </serinfo>
+            <pubinfo>
+              <pubplace>n/a</pubplace>
+              <publish>Elsevier BV</publish>
+            </pubinfo>
+            <othercit>ppg. 100002</othercit>
+            <onlink>https://doi.org/10.1016/j.srs.2020.100002</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>20190101</begdate>
+              <enddate>20230101</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>publication date</srccurr>
+        </srctime>
+        <srccitea>GEDI</srccitea>
+        <srccontr>predictor data for vegetation structure</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>John T. Abatzoglou</origin>
+            <origin>Solomon Z. Dobrowski</origin>
+            <origin>Sean A. Parks</origin>
+            <origin>Katherine C. Hegewisch</origin>
+            <pubdate>20180109</pubdate>
+            <title>TerraClimate, a high-resolution global dataset of monthly climate and climatic water balance from 1958–2015</title>
+            <geoform>raster digital data</geoform>
+            <serinfo>
+              <sername>Scientific Data</sername>
+              <issue>vol. 5, issue 1</issue>
+            </serinfo>
+            <pubinfo>
+              <pubplace>n/a</pubplace>
+              <publish>Springer Science and Business Media LLC</publish>
+            </pubinfo>
+            <onlink>https://doi.org/10.1038/sdata.2017.191</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>1979</begdate>
+              <enddate>2024</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>publication date</srccurr>
+        </srctime>
+        <srccitea>Terraclimate</srccitea>
+        <srccontr>Climate predictor data for SDMs</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>R. Crippen</origin>
+            <origin>S. Buckley</origin>
+            <origin>P. Agram</origin>
+            <origin>E. Belz</origin>
+            <origin>E. Gurrola</origin>
+            <origin>S. Hensley</origin>
+            <origin>M. Kobrick</origin>
+            <origin>M. Lavalle</origin>
+            <origin>J. Martin</origin>
+            <origin>M. Neumann</origin>
+            <origin>Q. Nguyen</origin>
+            <origin>P. Rosen</origin>
+            <origin>J. Shimada</origin>
+            <origin>M. Simard</origin>
+            <origin>W. Tung</origin>
+            <pubdate>20160613</pubdate>
+            <title>NASADEM GLOBAL ELEVATION MODEL: METHODS AND PROGRESS</title>
+            <geoform>raster digital data</geoform>
+            <serinfo>
+              <sername>ISPRS - International Archives of the Photogrammetry, Remote Sensing and Spatial Information Sciences</sername>
+              <issue>vol. XLI-B4</issue>
+            </serinfo>
+            <pubinfo>
+              <pubplace>n/a</pubplace>
+              <publish>Copernicus GmbH</publish>
+            </pubinfo>
+            <othercit>ppg. 125-128</othercit>
+            <onlink>https://doi.org/10.5194/isprsarchives-XLI-B4-125-2016</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <sngdate>
+              <caldate>2106</caldate>
+            </sngdate>
+          </timeinfo>
+          <srccurr>publication date</srccurr>
+        </srctime>
+        <srccitea>NASADEM</srccitea>
+        <srccontr>Slope and aspect predictors for SDM</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>David M. Theobald</origin>
+            <origin>Dylan Harrison-Atlas</origin>
+            <origin>William B. Monahan</origin>
+            <origin>Christine M. Albano</origin>
+            <pubdate>20151207</pubdate>
+            <title>Ecologically-Relevant Maps of Landforms and Physiographic Diversity for Climate Adaptation Planning</title>
+            <geoform>raster digital data</geoform>
+            <serinfo>
+              <sername>PLOS ONE</sername>
+              <issue>vol. 10, issue 12</issue>
+            </serinfo>
+            <pubinfo>
+              <pubplace>n/a</pubplace>
+              <publish>Public Library of Science (PLoS)</publish>
+            </pubinfo>
+            <othercit>ppg. e0143619</othercit>
+            <onlink>https://doi.org/10.1371/journal.pone.0143619</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <sngdate>
+              <caldate>2015</caldate>
+            </sngdate>
+          </timeinfo>
+          <srccurr>publication date</srccurr>
+        </srctime>
+        <srccitea>CPI Topography</srccitea>
+        <srccontr>Topography predictors for SDM</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>Collin G. Homer</origin>
+            <origin>Joyce A. Fry</origin>
+            <origin>Christopher A. Barnes</origin>
+            <pubdate>2012</pubdate>
+            <title>The National Land Cover Database</title>
+            <geoform>raster digital data</geoform>
+            <pubinfo>
+              <pubplace>n/a</pubplace>
+              <publish>US Geological Survey</publish>
+            </pubinfo>
+            <onlink>https://doi.org/10.3133/fs20123020</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>1985</begdate>
+              <enddate>2023</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>publication date</srccurr>
+        </srctime>
+        <srccitea>NLCD</srccitea>
+        <srccontr>Landcover predictors for SDM</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>Karin L. Riley</origin>
+            <origin>Isaac C. Grenfell</origin>
+            <origin>Mark A. Finney</origin>
+            <origin>Jason M. Wiener</origin>
+            <pubdate>20210115</pubdate>
+            <title>TreeMap, a tree-level model of conterminous US forests circa 2014 produced by imputation of FIA plot data</title>
+            <geoform>raster digital data</geoform>
+            <serinfo>
+              <sername>Scientific Data</sername>
+              <issue>vol. 8, issue 1</issue>
+            </serinfo>
+            <pubinfo>
+              <pubplace>n/a</pubplace>
+              <publish>Springer Science and Business Media LLC</publish>
+            </pubinfo>
+            <onlink>https://doi.org/10.1038/s41597-020-00782-x</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <sngdate>
+              <caldate>2016</caldate>
+            </sngdate>
+          </timeinfo>
+          <srccurr>publication date</srccurr>
+        </srctime>
+        <srccitea>TreeMap</srccitea>
+        <srccontr>Tree species predictors for SDM</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>John R. Sauer</origin>
+            <origin>William A. Link</origin>
+            <origin>Jane E. Fallon</origin>
+            <origin>Keith L. Pardieck</origin>
+            <origin>David J. Ziolkowski</origin>
+            <pubdate>201312</pubdate>
+            <title>The North American Breeding Bird Survey 1966–2011: Summary Analysis and Species Accounts</title>
+            <geoform>vector digital data</geoform>
+            <serinfo>
+              <sername>North American Fauna</sername>
+              <issue>vol. 79</issue>
+            </serinfo>
+            <pubinfo>
+              <pubplace>n/a</pubplace>
+              <publish>U.S. Fish and Wildlife Service</publish>
+            </pubinfo>
+            <othercit>ppg. 1-32</othercit>
+            <onlink>https://doi.org/10.3996/nafa.79.0001</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>1966</begdate>
+              <enddate>2024</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>publication date</srccurr>
+        </srctime>
+        <srccitea>BBS</srccitea>
+        <srccontr>Validation data for SDM outputs</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>Stephen N. Matthews</origin>
+            <origin>Louis R. Iverson</origin>
+            <origin>Anantha M. Prasad</origin>
+            <origin>Matthew P. Peters</origin>
+            <pubdate>20111207</pubdate>
+            <title>Changes in potential habitat of 147 North American breeding bird species in response to redistribution of trees and climate following predicted climate change</title>
+            <geoform>raster digital data</geoform>
+            <serinfo>
+              <sername>Ecography</sername>
+              <issue>vol. 34, issue 6</issue>
+            </serinfo>
+            <pubinfo>
+              <pubplace>n/a</pubplace>
+              <publish>Wiley</publish>
+            </pubinfo>
+            <othercit>ppg. 933-945</othercit>
+            <onlink>https://doi.org/10.1111/j.1600-0587.2011.06803.x</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <sngdate>
+              <caldate>2011</caldate>
+            </sngdate>
+          </timeinfo>
+          <srccurr>publication date</srccurr>
+        </srctime>
+        <srccitea>Climate Change Bird Atlas</srccitea>
+        <srccontr>Validation data for SDM outputs</srccontr>
+      </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>D Fink</origin>
+            <origin>T Auer</origin>
+            <origin>A Johnston</origin>
+            <origin>M Strimas-Mackey</origin>
+            <origin>S Ligocki</origin>
+            <origin>O Robinson</origin>
+            <origin>W Hochachka</origin>
+            <origin>L Jaromczyk</origin>
+            <origin>C Crowley</origin>
+            <origin>K Dunham</origin>
+            <origin>A Stillman</origin>
+            <origin>I Davies</origin>
+            <origin>A Rodewald</origin>
+            <origin>V Ruiz-Gutierrez</origin>
+            <origin>C Wood</origin>
+            <pubdate>20231115</pubdate>
+            <title>eBird Status and Trends, Data Version 2022</title>
+            <geoform>publication</geoform>
+            <pubinfo>
+              <pubplace>n/a</pubplace>
+              <publish>Cornell Lab of Ornithology</publish>
+            </pubinfo>
+            <onlink>https://doi.org/10.2173/ebirdst.2022</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <sngdate>
+              <caldate>2022</caldate>
+            </sngdate>
+          </timeinfo>
+          <srccurr>publication date</srccurr>
+        </srctime>
+        <srccitea>eBird S&amp;T</srccitea>
+        <srccontr>Validation data to compare against  SDM ouptuts</srccontr>
+      </srcinfo>
+      <procstep>
+        <procdesc>We predicted habitat suitability across Bird Conservation Region 28 (BCR28; hereafter, Appalachian BCR; Fig. 1), which encompasses the Appalachian Mountains from Georgia to Massachusetts, generally ranging from the Blue Ridge to the east to the Cumberland and Allegheny Plateaus to the west and extending northward into the Catskills and Berkshires. This region contains a wide variety of vegetation, climate, human land use patterns, land ownership, topography, and microclimates.  </procdesc>
+        <procdate>20250501</procdate>
+        <proccont>
+          <cntinfo>
+            <cntperp>
+              <cntper>Samuel Flake</cntper>
+            </cntperp>
+            <cntaddr>
+              <addrtype>mailing</addrtype>
+              <address>North Carolina State University</address>
+              <city>Raleigh</city>
+              <state>NC</state>
+              <postal>27695</postal>
+            </cntaddr>
+            <cntvoice>336-944-1198</cntvoice>
+            <cntemail>swflake@ncsu.edu</cntemail>
+          </cntinfo>
+        </proccont>
+      </procstep>
+      <procstep>
+        <procdesc>Selection and thinning of eBird data:
+
+We selected eBird, a participatory science project which allows recreational bird watchers to track their observations while contributing to a public dataset (Sullivan et al. 2009). The response variable we used for our SDMs is the encounter rate, which we term here Habitat Index (HI) after balancing presences and absences. The use of encounter rate or HI (the probability of an observer recording a species) rather than occupancy (the probability of a species being present) limits the inferences we can make, but it has several advantages in computation tractability when fitting complex interactions and nonlinear responses. HI cannot be interpreted directly as a probability of encounter or occupancy because the prevalence of each of these species differs from that of the class-balanced dataset, but higher values of HI are associated with higher encounter rate, providing an index of species encounter that is scaled the same for each species.
+Records from eBird (“checklists”) are varied in terms of the distance they cover, the time started, the duration, and the observation protocol used, so we followed best practices to filter and then data from checklists that are likely to contain the highest quality spatial information (Strimas-Mackey et al. 2020, Johnston et al. 2021).  We included effort variables (length of checklist, time of day started) in our SDMs to account for some of the variation in detection probability among checklists (Strimas-Mackey et al. 2020). For each species, we balanced the dataset to 50:50 observed/non-observed by randomly drawing an equal number of checklists where the species was not observed to create a set of spatio-temporally thinned absences (i.e., the Habitat Index described above).
+</procdesc>
+        <srcused>eBird</srcused>
+        <procdate>20250501</procdate>
+      </procstep>
+      <procstep>
+        <procdesc>Obtaining GEDI predictor data:
+
+The GEDI (Global Ecosystem Dynamics Investigation) LiDAR sensor works by emitting laser pulses from the International Space Station toward Earth's surface and measuring the time it takes for the signal to return after bouncing off vegetation and ground surfaces (Dubayah et al. 2020). The sensor uses eight laser beams to create a sampling pattern across the landscape, taking intermittent “shots” that characterize the light returns the 25-m footprint. This moderate spatial resolution is commensurate with the typical resolution of bird observations (Ralph et al. 1995). GEDI has collected billions of shots between 51.6° north and south latitudes, providing excellent coverage of temperate and tropical forests (Duncanson et al., 2022). Data are available at several levels, from the vertical profiles of footprints (Level 2 data) to gridded derived products (e.g., 1-km gridded biomass) (Dubayah et al. 2022a).
+We obtained GEDI data from Google Earth Engine (Gorelick et al. 2017) using the rgee package (Aybar et al. 2020), which provides R bindings for Earth Engine’s python API (https://github.com/google/earthengine-api). Among other benefits, the dataset hosted on GEE allows requests of a subset (spatial and temporal) of the GEDI data without downloading entire paths. For data associated with bird occurrence records used to train the SDMs, we obtained all GEDI shots within the buffer around each point and aggregated those shots to a single checklist-level value. 
+We derived five variables from GEDI data (Table 1): Ht, canopy height (m), calculated as the height at which 98% of returns had occurred (RH98); Biomass, vegetation biomass (Mg ha-1), as calculated by GEDI level 2b (Dubayah et al. 2022a); FHD, foliage height diversity (MacArthur and Horn 1969), as calculated in GEDI Level 2b (unitless); UnderRatio, calculated as the proportion of total vegetation volume which occurred below 5 m; and PropShort, the proportion of shots within the buffer with RH98 &lt; 5 m.
+</procdesc>
+        <srcused>GEDI</srcused>
+        <procdate>20250501</procdate>
+      </procstep>
+      <procstep>
+        <procdesc>Additional predictor data:
+
+Climate is one of the most important predictors of occurrence for most species. We used interpolated observed climate data from TerraClimate (Abatzoglou et al. 2018), which we accessed through GEE. For our SDMs, we used a ten-year average of summer weather conditions preceding each observation, in order to account for changes in weather across the study period. For each checklist, we obtained temperature, precipitation, and water balance variables for June – August of the ten years preceding the checklist year (including the year of observation) and took their mean (Table 2).
+We obtained topographic variables from preprocessed layers available on GEE. Slope steepness was obtained from NASADEM (Crippen et al. 2016). A measure of topographic heat load, CHILI, and a measure of ridge/valley topographic position (TPI) were obtained from ALOS courtesy of Conservation Partners International (Theobald et al. 2015).
+For vegetation cover and species composition, we used the National Land Cover Database (NLCD) (Homer et al. 2012) and TreeMap (Riley et al. 2021). NLCD uses Landsat images to classify land cover into coarse categories, such as deciduous forest, coniferous forest, water, several classes of developed land, crops, shrubland, and others. It has a high accuracy, spatial and temporal resolution, and is mapped wall-to-wall, at the expense of thematic resolution. From NLCD, we chose several landcover types (Table 2) and calculated the proportion of each buffered point made up of those cover types. TreeMap similarly uses remote sensing to classify land cover, but instead of coarse categories of landcover type, it uses imputed FIA plots to map forest composition. TreeMap is only available at a few timesteps; we used the 2016 snapshot version. From TreeMap, we calculated the proportion of the biomass of each cell that was made up of hardwoods, oak and hickory species specifically, and spruce and fir species. 
+</procdesc>
+        <srcused>Terraclimate</srcused>
+        <srcused>NASADEM</srcused>
+        <srcused>CPI Topography</srcused>
+        <srcused>NLCD</srcused>
+        <srcused>TreeMap</srcused>
+        <procdate>20250501</procdate>
+      </procstep>
+      <procstep>
+        <procdesc>We fit our SDMs using boosted regression trees (BRTs; (Elith et al. 2008)). BRTs are an extension of regression trees; they are similar to random forests in that the final model is the outcome of aggregating many regression trees, each fit to subsets of the dataset. Compared to linear regression, BRTs (and other tree-based methods) have several advantages: they are good at representing interactions (because nodes of trees depend on the values of variables preceding them in the tree); they allow complex nonlinear responses to predictor variables; they allow for a variety of data types; and they are accommodating of outliers and missing data (De’ath and Fabricius 2000). BRTs differ from other tree methods by using boosting, a sequential method of adding trees in which new trees are fit to the residuals of previous trees, weighting data points heaviest that were most poorly fit by previous trees. Boosting also introduces randomness to each iteration by sampling (bagging) a portion of the data at each step. 
+For each species, we fit binomial BRTs with observed/non-observed as the response variable. We used the gbm.step function in R package dismo to iteratively select the number of trees which maximized model fit. The gbm.step function continuously fits BRTs with more trees until it has minimized the residual deviance. Model fit was assessed using residual deviance and area under the curve (AUC) of the receiver operating characteristic curve from 10-fold cross-validation. 
+We used default values for learning rate (0.01) and bag fraction (0.75); varying these values through a plausible range had no effect on the rank order of predictor variable importance, no noteworthy impact on the partial effects of variables, and negligible effect on model fit (change in cross-validated AUC &lt; 0.003). </procdesc>
+        <procdate>20250501</procdate>
+      </procstep>
+      <procstep>
+        <procdesc>We compared predictions from each BRT model to Breeding Bird Survey (BBS) data (Sauer et al. 2013). BBS is done annually in the breeding season following repeated routes. Each route comprises 50 “stops” where point counts are conducted. BBS data are not reliably available at the scale of individual point counts, so we instead compare the route-level encounter rate to the average Habitat Index of the SDM for the area. For each SDM, we estimated a prediction surface for the average climatic conditions from 2010-2020 and we extracted the predictions for a 200 m buffer around BBS routes. We calculated Spearman’s correlation coefficient between the extracted SDM predictions and the observed BBS encounter rate.
+We also compared our models’ predicted maps of HI to two other modeled habitat products created using very different methodologies: eBird Status and Trends and Climate Change Bird Atlas. eBird Status and Trends (Fink et al. 2020, D. Fink et al. 2023) is a product modeled from eBird data (like our models), but using a different model framework and different suites of predictor variables. Climate Change Bird Atlas (Matthews et al. 2011) is a product based upon BBS data, which primarily uses climate variables to predict bird abundances. We randomly generated 1000 points within the Appalachian BCR, and extracted predicted habitat value from our predictions, eBird Status and Trends, and the Climate Change Bird Atlas, and compared their rank-order correlation using Spearman’s correlation coefficient.
+</procdesc>
+        <srcused>BBS</srcused>
+        <srcused>Climate Change Bird Atlas</srcused>
+        <srcused>eBird S&amp;T</srcused>
+        <procdate>20250501</procdate>
+      </procstep>
+    </lineage>
+  </dataqual>
+  <spdoinfo>
+    <direct>Raster</direct>
+    <rastinfo>
+      <rasttype>Pixel</rasttype>
+      <rowcount>1302</rowcount>
+      <colcount>1139</colcount>
+    </rastinfo>
+  </spdoinfo>
+  <spref>
+    <horizsys>
+      <local>
+        <localdes>NAD83 / CONUS Albers (EPSG:5070)</localdes>
+        <localgeo>PROJCS["NAD83 / Conus Albers",
+    GEOGCS["NAD83",
+        DATUM["North_American_Datum_1983",
+            SPHEROID["GRS 1980",6378137,298.257222101],
+            TOWGS84[0,0,0,0,0,0,0]],
+        PRIMEM["Greenwich",0,
+            AUTHORITY["EPSG","8901"]],
+        UNIT["degree",0.0174532925199433,
+            AUTHORITY["EPSG","9122"]],
+        AUTHORITY["EPSG","4269"]],
+    PROJECTION["Albers_Conic_Equal_Area"],
+    PARAMETER["latitude_of_center",23],
+    PARAMETER["longitude_of_center",-96],
+    PARAMETER["standard_parallel_1",29.5],
+    PARAMETER["standard_parallel_2",45.5],
+    PARAMETER["false_easting",0],
+    PARAMETER["false_northing",0],
+    UNIT["metre",1,
+        AUTHORITY["EPSG","9001"]],
+    AXIS["Easting",EAST],
+    AXIS["Northing",NORTH],
+    AUTHORITY["EPSG","5070"]]</localgeo>
+      </local>
+      <geodetic>
+        <horizdn>North American Datum of 1983 (NAD 83)</horizdn>
+        <ellips>Geodetic Reference System 1980</ellips>
+        <semiaxis>6378137.000000</semiaxis>
+        <denflat>298.257222</denflat>
+      </geodetic>
+    </horizsys>
+  </spref>
+  <eainfo>
+    <detailed>
+      <enttyp>
+        <enttypl>Predicted Habitat Index</enttypl>
+        <enttypd>Raster geospatial data file.</enttypd>
+        <enttypds>Producer Defined</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>Value</attrlabl>
+        <attrdef>Habitat index (class-balanced encounter rate). Probability of an observer encountering the species during a one-hour observation, starting at 10 AM, and traveling 1 km.</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>
+  nan</edomv>
+            <edomvd>
+  Outside of study area</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <rdom>
+            <rdommin>0</rdommin>
+            <rdommax>1</rdommax>
+            <attrunit>NA</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+    </detailed>
+    <overview>
+      <eaover>Raster files are identified by a four-letter banding code for species, and a spatial scale following. The spatial scale represents the size of the buffer around each observation point for which data were aggregated (not the grain of the maps, which are all 1-km). 
+
+Banding codes for study species are as follows:
+
+Species		Scientific name	Banding code
+
+Acadian flycatcher	Empidonax virescens	ACFL
+Alder flycatcher	Empidonax alnorum	ALFL
+Blackburnian warbler	Setophaga fusca	BLBW
+Black-capped chickadee	Poecile atricapillus	BCCH
+Blue-winged warbler	Vermivora cyanoptera	BWWA
+Brown-headed nuthatch	Sitta pusilla		BHNU
+Cerulean warbler	Setophaga cerulea	CERW
+Eastern whip-poor-will	Antrostomus vociferus	EWPW
+Golden-winged warbler	Vermivora chrysoptera	GWWA
+Hermit thrush		Catharus guttatus	HETH
+Kentucky warbler	Geothlypis formosa	KEWA
+Louisiana waterthrush	Parkesia motacilla	LOWA
+Nashville warbler	Leiothlypis ruficapilla	NAWA
+Northern saw-whet owl	Aegolius acadicus	NSWO
+Olive-sided flycatcher	Contopus cooperi	OSFL
+Ovenbird		Seiurus aurocapilla	OVEN
+Prairie warbler	Setophaga discolor	PRAW
+Protonotary warbler	Protonotaria citrea	PROW
+Red crossbill		Loxia curvirostra	RECR
+Ruffed grouse		Bonasa umbellus	RUGR
+Swainson’s warbler	Limnothlypis swainsonii	SWWA
+Veery		Catharus fuscescens	VEER
+Wood thrush		Hylocichla mustelina	WOTH
+Worm-eating warbler	Helmitheros vermivorus	WEWA
+Yellow-throated warbler	Setophaga dominica	YTWA
+</eaover>
+      <eadetcit>NA</eadetcit>
+    </overview>
+  </eainfo>
+  <distinfo>
+    <distrib>
+      <cntinfo>
+        <cntperp>
+          <cntper>Samuel Flake</cntper>
+          <cntorg>North Carolina State University</cntorg>
+        </cntperp>
+        <cntaddr>
+          <addrtype>mailing address</addrtype>
+          <address>North Carolina State University</address>
+          <city>Raleigh</city>
+          <state>NC</state>
+          <postal>27695</postal>
+        </cntaddr>
+        <cntvoice>336-944-1198</cntvoice>
+        <cntemail>swflake@ncsu.edu</cntemail>
+      </cntinfo>
+    </distrib>
+    <distliab>Unless otherwise stated, all data, metadata and related materials are considered to satisfy the quality standards relative to the purpose for which the data were collected. Although these data and associated metadata have been reviewed for accuracy and completeness and approved for release by the U.S. Geological Survey (USGS), no warranty expressed or implied is made regarding the display or utility of the data for other purposes, nor on all computer systems, nor shall the act of distribution constitute any such warranty.</distliab>
+    <stdorder>
+      <digform><digtinfo>
+          <formname>Digital Data</formname>
+        </digtinfo>
+        <digtopt><onlinopt><computer><networka><networkr>https://github.com/flakesw/LANDIS-Birds/tree/master/sdm_analysis/outputs/prediction_maps</networkr></networka></computer></onlinopt></digtopt></digform>
+      <fees>None</fees>
+    </stdorder>
+  </distinfo>
+  <metainfo>
+    <metd>20250502</metd>
+    <metc>
+      <cntinfo>
+        <cntperp>
+          <cntper>Samuel W. Flake</cntper>
+          <cntorg>North Carolina State University</cntorg>
+        </cntperp>
+        <cntpos>Postdoctoral scholar</cntpos>
+        <cntaddr>
+          <addrtype>mailing</addrtype>
+          <address>North Carolina State University</address>
+          <city>Raleigh</city>
+          <state>NC</state>
+          <postal>27695</postal>
+        </cntaddr>
+        <cntvoice>336-944-1198</cntvoice>
+        <cntemail>swflake@ncsu.edu</cntemail>
+      </cntinfo>
+    </metc>
+    <metstdn>FGDC Biological Data Profile of the Content Standard for Digital Geospatial Metadata</metstdn>
+    <metstdv>FGDC-STD-001.1-1999</metstdv>
+  </metainfo>
+</metadata>
