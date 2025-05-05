@@ -1,5 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--Record created using version 2.1.0 of the USGS Metadata Wizard tool. (https://github.com/DOI-USGS/fort-pymdwizard)-->
 <metadata>
   <idinfo>
     <citation>
@@ -34,10 +33,10 @@
     <spdom>
       <descgeog>Bird Conservation Region 28</descgeog>
       <bounding>
-        <westbc>-83.7598</westbc>
-        <eastbc>-72.5098</eastbc>
-        <northbc>42.1634</northbc>
-        <southbc>33.3213</southbc>
+        <westbc>-87.9195</westbc>
+        <eastbc>-72.6144</eastbc>
+        <northbc>44.2167</northbc>
+        <southbc>31.1191</southbc>
       </bounding>
     </spdom>
     <keywords>
@@ -478,6 +477,28 @@ tidyverse_1.3.2 sf_1.0-19       terra_1.6-47  </native>
         <srccitea>eBird S&amp;T</srccitea>
         <srccontr>Validation data to compare against  SDM ouptuts</srccontr>
       </srcinfo>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>Samuel W. Flake</origin>
+            <pubdate>20250505</pubdate>
+            <title>Species distribution models for Appalachian bird species of conservation concern, circa 2023</title>
+            <geoform>tabular digital data</geoform>
+            <onlink>doi.org/10.5281/zenodo.15345311</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <sngdate>
+              <caldate>2023</caldate>
+            </sngdate>
+          </timeinfo>
+          <srccurr>observed</srccurr>
+        </srctime>
+        <srccitea>SDMs</srccitea>
+        <srccontr>Species distribution models used to create predictions</srccontr>
+      </srcinfo>
       <procstep>
         <procdesc>We predicted habitat suitability across Bird Conservation Region 28 (BCR28; hereafter, Appalachian BCR; Fig. 1), which encompasses the Appalachian Mountains from Georgia to Massachusetts, generally ranging from the Blue Ridge to the east to the Cumberland and Allegheny Plateaus to the west and extending northward into the Catskills and Berkshires. This region contains a wide variety of vegetation, climate, human land use patterns, land ownership, topography, and microclimates.  </procdesc>
         <procdate>20250501</procdate>
@@ -499,95 +520,55 @@ tidyverse_1.3.2 sf_1.0-19       terra_1.6-47  </native>
         </proccont>
       </procstep>
       <procstep>
-        <procdesc>Selection and thinning of eBird data:
-
-We selected eBird, a participatory science project which allows recreational bird watchers to track their observations while contributing to a public dataset (Sullivan et al. 2009). The response variable we used for our SDMs is the encounter rate, which we term here Habitat Index (HI) after balancing presences and absences. The use of encounter rate or HI (the probability of an observer recording a species) rather than occupancy (the probability of a species being present) limits the inferences we can make, but it has several advantages in computation tractability when fitting complex interactions and nonlinear responses. HI cannot be interpreted directly as a probability of encounter or occupancy because the prevalence of each of these species differs from that of the class-balanced dataset, but higher values of HI are associated with higher encounter rate, providing an index of species encounter that is scaled the same for each species.
-Records from eBird (“checklists”) are varied in terms of the distance they cover, the time started, the duration, and the observation protocol used, so we followed best practices to filter and then data from checklists that are likely to contain the highest quality spatial information (Strimas-Mackey et al. 2020, Johnston et al. 2021).  We included effort variables (length of checklist, time of day started) in our SDMs to account for some of the variation in detection probability among checklists (Strimas-Mackey et al. 2020). For each species, we balanced the dataset to 50:50 observed/non-observed by randomly drawing an equal number of checklists where the species was not observed to create a set of spatio-temporally thinned absences (i.e., the Habitat Index described above).
-</procdesc>
-        <srcused>eBird</srcused>
-        <procdate>20250501</procdate>
-      </procstep>
-      <procstep>
-        <procdesc>Obtaining GEDI predictor data:
-
-The GEDI (Global Ecosystem Dynamics Investigation) LiDAR sensor works by emitting laser pulses from the International Space Station toward Earth's surface and measuring the time it takes for the signal to return after bouncing off vegetation and ground surfaces (Dubayah et al. 2020). The sensor uses eight laser beams to create a sampling pattern across the landscape, taking intermittent “shots” that characterize the light returns the 25-m footprint. This moderate spatial resolution is commensurate with the typical resolution of bird observations (Ralph et al. 1995). GEDI has collected billions of shots between 51.6° north and south latitudes, providing excellent coverage of temperate and tropical forests (Duncanson et al., 2022). Data are available at several levels, from the vertical profiles of footprints (Level 2 data) to gridded derived products (e.g., 1-km gridded biomass) (Dubayah et al. 2022a).
-We obtained GEDI data from Google Earth Engine (Gorelick et al. 2017) using the rgee package (Aybar et al. 2020), which provides R bindings for Earth Engine’s python API (https://github.com/google/earthengine-api). Among other benefits, the dataset hosted on GEE allows requests of a subset (spatial and temporal) of the GEDI data without downloading entire paths. For data associated with bird occurrence records used to train the SDMs, we obtained all GEDI shots within the buffer around each point and aggregated those shots to a single checklist-level value. 
-We derived five variables from GEDI data (Table 1): Ht, canopy height (m), calculated as the height at which 98% of returns had occurred (RH98); Biomass, vegetation biomass (Mg ha-1), as calculated by GEDI level 2b (Dubayah et al. 2022a); FHD, foliage height diversity (MacArthur and Horn 1969), as calculated in GEDI Level 2b (unitless); UnderRatio, calculated as the proportion of total vegetation volume which occurred below 5 m; and PropShort, the proportion of shots within the buffer with RH98 &lt; 5 m.
-</procdesc>
+        <procdesc>We generated predictions from species distribution models fit to eBird data representing breeding season observations from 2013-2023. eBird data were extracted and spatio-temporally thinned following recommended best practices. We built SDMs using boosted regression trees in R packages dismo and gbm. For more details on the SDMs, see doi.org/10.5281/zenodo.15345311</procdesc>
+        <srcused>SDMs</srcused>
         <srcused>GEDI</srcused>
-        <procdate>20250501</procdate>
-      </procstep>
-      <procstep>
-        <procdesc>Additional predictor data:
-
-Climate is one of the most important predictors of occurrence for most species. We used interpolated observed climate data from TerraClimate (Abatzoglou et al. 2018), which we accessed through GEE. For our SDMs, we used a ten-year average of summer weather conditions preceding each observation, in order to account for changes in weather across the study period. For each checklist, we obtained temperature, precipitation, and water balance variables for June – August of the ten years preceding the checklist year (including the year of observation) and took their mean (Table 2).
-We obtained topographic variables from preprocessed layers available on GEE. Slope steepness was obtained from NASADEM (Crippen et al. 2016). A measure of topographic heat load, CHILI, and a measure of ridge/valley topographic position (TPI) were obtained from ALOS courtesy of Conservation Partners International (Theobald et al. 2015).
-For vegetation cover and species composition, we used the National Land Cover Database (NLCD) (Homer et al. 2012) and TreeMap (Riley et al. 2021). NLCD uses Landsat images to classify land cover into coarse categories, such as deciduous forest, coniferous forest, water, several classes of developed land, crops, shrubland, and others. It has a high accuracy, spatial and temporal resolution, and is mapped wall-to-wall, at the expense of thematic resolution. From NLCD, we chose several landcover types (Table 2) and calculated the proportion of each buffered point made up of those cover types. TreeMap similarly uses remote sensing to classify land cover, but instead of coarse categories of landcover type, it uses imputed FIA plots to map forest composition. TreeMap is only available at a few timesteps; we used the 2016 snapshot version. From TreeMap, we calculated the proportion of the biomass of each cell that was made up of hardwoods, oak and hickory species specifically, and spruce and fir species. 
-</procdesc>
         <srcused>Terraclimate</srcused>
         <srcused>NASADEM</srcused>
-        <srcused>CPI Topography</srcused>
+        <srcused>CPI topography</srcused>
         <srcused>NLCD</srcused>
         <srcused>TreeMap</srcused>
-        <procdate>20250501</procdate>
-      </procstep>
-      <procstep>
-        <procdesc>We fit our SDMs using boosted regression trees (BRTs; (Elith et al. 2008)). BRTs are an extension of regression trees; they are similar to random forests in that the final model is the outcome of aggregating many regression trees, each fit to subsets of the dataset. Compared to linear regression, BRTs (and other tree-based methods) have several advantages: they are good at representing interactions (because nodes of trees depend on the values of variables preceding them in the tree); they allow complex nonlinear responses to predictor variables; they allow for a variety of data types; and they are accommodating of outliers and missing data (De’ath and Fabricius 2000). BRTs differ from other tree methods by using boosting, a sequential method of adding trees in which new trees are fit to the residuals of previous trees, weighting data points heaviest that were most poorly fit by previous trees. Boosting also introduces randomness to each iteration by sampling (bagging) a portion of the data at each step. 
-For each species, we fit binomial BRTs with observed/non-observed as the response variable. We used the gbm.step function in R package dismo to iteratively select the number of trees which maximized model fit. The gbm.step function continuously fits BRTs with more trees until it has minimized the residual deviance. Model fit was assessed using residual deviance and area under the curve (AUC) of the receiver operating characteristic curve from 10-fold cross-validation. 
-We used default values for learning rate (0.01) and bag fraction (0.75); varying these values through a plausible range had no effect on the rank order of predictor variable importance, no noteworthy impact on the partial effects of variables, and negligible effect on model fit (change in cross-validated AUC &lt; 0.003). </procdesc>
-        <procdate>20250501</procdate>
-      </procstep>
-      <procstep>
-        <procdesc>We compared predictions from each BRT model to Breeding Bird Survey (BBS) data (Sauer et al. 2013). BBS is done annually in the breeding season following repeated routes. Each route comprises 50 “stops” where point counts are conducted. BBS data are not reliably available at the scale of individual point counts, so we instead compare the route-level encounter rate to the average Habitat Index of the SDM for the area. For each SDM, we estimated a prediction surface for the average climatic conditions from 2010-2020 and we extracted the predictions for a 200 m buffer around BBS routes. We calculated Spearman’s correlation coefficient between the extracted SDM predictions and the observed BBS encounter rate.
-We also compared our models’ predicted maps of HI to two other modeled habitat products created using very different methodologies: eBird Status and Trends and Climate Change Bird Atlas. eBird Status and Trends (Fink et al. 2020, D. Fink et al. 2023) is a product modeled from eBird data (like our models), but using a different model framework and different suites of predictor variables. Climate Change Bird Atlas (Matthews et al. 2011) is a product based upon BBS data, which primarily uses climate variables to predict bird abundances. We randomly generated 1000 points within the Appalachian BCR, and extracted predicted habitat value from our predictions, eBird Status and Trends, and the Climate Change Bird Atlas, and compared their rank-order correlation using Spearman’s correlation coefficient.
-</procdesc>
-        <srcused>BBS</srcused>
-        <srcused>Climate Change Bird Atlas</srcused>
-        <srcused>eBird S&amp;T</srcused>
-        <procdate>20250501</procdate>
+        <procdate>2025</procdate>
       </procstep>
     </lineage>
   </dataqual>
   <spdoinfo>
     <direct>Raster</direct>
     <rastinfo>
-      <rasttype>Pixel</rasttype>
+      <rasttype>Grid Cell</rasttype>
       <rowcount>1302</rowcount>
       <colcount>1139</colcount>
+      <vrtcount>1</vrtcount>
     </rastinfo>
   </spdoinfo>
   <spref>
     <horizsys>
-      <local>
-        <localdes>NAD83 / CONUS Albers (EPSG:5070)</localdes>
-        <localgeo>PROJCS["NAD83 / Conus Albers",
-    GEOGCS["NAD83",
-        DATUM["North_American_Datum_1983",
-            SPHEROID["GRS 1980",6378137,298.257222101],
-            TOWGS84[0,0,0,0,0,0,0]],
-        PRIMEM["Greenwich",0,
-            AUTHORITY["EPSG","8901"]],
-        UNIT["degree",0.0174532925199433,
-            AUTHORITY["EPSG","9122"]],
-        AUTHORITY["EPSG","4269"]],
-    PROJECTION["Albers_Conic_Equal_Area"],
-    PARAMETER["latitude_of_center",23],
-    PARAMETER["longitude_of_center",-96],
-    PARAMETER["standard_parallel_1",29.5],
-    PARAMETER["standard_parallel_2",45.5],
-    PARAMETER["false_easting",0],
-    PARAMETER["false_northing",0],
-    UNIT["metre",1,
-        AUTHORITY["EPSG","9001"]],
-    AXIS["Easting",EAST],
-    AXIS["Northing",NORTH],
-    AUTHORITY["EPSG","5070"]]</localgeo>
-      </local>
+      <planar>
+        <mapproj>
+          <mapprojn>Albers Conical Equal Area</mapprojn>
+          <albers>
+            <stdparll>29.5</stdparll>
+            <stdparll>45.5</stdparll>
+            <longcm>-96.0</longcm>
+            <latprjo>23.0</latprjo>
+            <feast>0.0</feast>
+            <fnorth>0.0</fnorth>
+          </albers>
+        </mapproj>
+        <planci>
+          <plance>row and column</plance>
+          <coordrep>
+            <absres>1000.0</absres>
+            <ordres>999.9999999999998</ordres>
+          </coordrep>
+          <plandu>meters</plandu>
+        </planci>
+      </planar>
       <geodetic>
-        <horizdn>North American Datum of 1983 (NAD 83)</horizdn>
-        <ellips>Geodetic Reference System 1980</ellips>
-        <semiaxis>6378137.000000</semiaxis>
-        <denflat>298.257222</denflat>
+        <horizdn>North_American_Datum_1983</horizdn>
+        <ellips>GRS 1980</ellips>
+        <semiaxis>6378137.0</semiaxis>
+        <denflat>298.257222101</denflat>
       </geodetic>
     </horizsys>
   </spref>
@@ -604,10 +585,8 @@ We also compared our models’ predicted maps of HI to two other modeled habitat
         <attrdefs>Producer Defined</attrdefs>
         <attrdomv>
           <edom>
-            <edomv>
-  nan</edomv>
-            <edomvd>
-  Outside of study area</edomvd>
+            <edomv>nan</edomv>
+            <edomvd>Outside of study area</edomvd>
             <edomvds>Producer defined</edomvds>
           </edom>
         </attrdomv>
