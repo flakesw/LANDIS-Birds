@@ -32,7 +32,7 @@ bcr_albers <- bcr %>%
 # st_crop(ecoregions) #
 
 #import predictions just to use as a template
-preds <- rast(paste0("./sdm_analysis/outputs/prediction_maps/", species, "_dist_model_full.tiff"))
+preds <- rast(paste0("./sdm_analysis/outputs/prediction_maps/model_subsets/", species, "_dist_model_full.tiff"))
 states <- sf::st_read("C:/Users/Sam/Documents/Maps/Basic maps/state boundaries/cb_2018_us_state_5m/cb_2018_us_state_5m.shp") %>%
   sf::st_transform(crs = crs(preds)) %>%
   st_crop(preds)
@@ -44,7 +44,9 @@ states <- sf::st_read("C:/Users/Sam/Documents/Maps/Basic maps/state boundaries/c
 mod1 <- readRDS("./sdm_analysis/sdms/cerw_dist_model_full.RDS")
 mod2 <- readRDS("./sdm_analysis/sdms/gwwa_dist_model_full.RDS")
 
-gbm.plot(mod1, n.plots = 24, plot.layout = c(4,3), common.scale = TRUE, write.title = TRUE)
+gbm.plot(mod1, n.plots = 24, plot.layout = c(4,3), 
+         common.scale = TRUE, write.title = TRUE,
+         cex = 0.5)
 gbm.plot(mod2, n.plots = 24, plot.layout = c(4,3), common.scale = TRUE, write.title = TRUE)
 
 #---------------------------------------------------
@@ -264,39 +266,39 @@ ggsave(file="./sdm_analysis/outputs/fig_5_variable_importance.svg", plot=varimp_
 #TODO finish this part?
 #---------------------------------------------------
 
-
-model_list$model_cv_stats_list <- map(model_list$models, .f = function(x) pluck(x) %>% 
-                                        pluck("cv.statistics") %>% 
-                                        pluck("discrimination.mean")) %>%
-  unlist() 
-
-# model_list$var_importance_list <- map(model_list$models, .f = function(x) pluck(x) %>% 
-#                                         pluck("contributions")) %>%
-#   map(left_join())
-
-
-varimp_list <- model_list %>%
-  dplyr::select(species, scale, var_importance_list) %>%
-  unnest(cols = var_importance_list) %>%
-  # filter(var %in% vars_to_plot) %>%
-  mutate(scale = factor(scale, levels = c("100", "500", "1000", "5000", "10000", "effort"))) %>%
-  left_join(var_tab, by = c("var" = "var")) %>%
-  group_by(species, scale, Type) %>%
-  dplyr::summarize(total_importance = sum(rel.inf))
-
-varimp_scale <- ggplot(varimp_list, aes(x = scale, y = total_importance, col = species, group = species)) +
-  geom_point() +
-  geom_line(data = varimp_list %>% filter(!(scale %in% "effort"))) +
-  labs(y = expression(paste("Relative variable influence (percent)")), x = "Scale (m)") +
-  scale_color_manual(labels = c("CERW", "GWWA"), values = c("#00a6e2", "#ebca14")) +
-  theme(legend.title = element_blank()) +
-  facet_wrap(facets = "Type") +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-varimp_scale <- tag_facet(varimp_scale)
-varimp_scale <- shift_legend2(varimp_scale)
-
-plot(varimp_scale)
-ggsave(file="./sdm_analysis/outputs/fig_xx_relative influence of predictor types.svg", plot=varimp_scale, width=5, height=3)
+# 
+# model_list$model_cv_stats_list <- map(model_list$models, .f = function(x) pluck(x) %>% 
+#                                         pluck("cv.statistics") %>% 
+#                                         pluck("discrimination.mean")) %>%
+#   unlist() 
+# 
+# # model_list$var_importance_list <- map(model_list$models, .f = function(x) pluck(x) %>% 
+# #                                         pluck("contributions")) %>%
+# #   map(left_join())
+# 
+# 
+# varimp_list <- model_list %>%
+#   dplyr::select(species, scale, var_importance_list) %>%
+#   unnest(cols = var_importance_list) %>%
+#   # filter(var %in% vars_to_plot) %>%
+#   mutate(scale = factor(scale, levels = c("100", "500", "1000", "5000", "10000", "effort"))) %>%
+#   left_join(var_tab, by = c("var" = "var")) %>%
+#   group_by(species, scale, Type) %>%
+#   dplyr::summarize(total_importance = sum(rel.inf))
+# 
+# varimp_scale <- ggplot(varimp_list, aes(x = scale, y = total_importance, col = species, group = species)) +
+#   geom_point() +
+#   geom_line(data = varimp_list %>% filter(!(scale %in% "effort"))) +
+#   labs(y = expression(paste("Relative variable influence (percent)")), x = "Scale (m)") +
+#   scale_color_manual(labels = c("CERW", "GWWA"), values = c("#00a6e2", "#ebca14")) +
+#   theme(legend.title = element_blank()) +
+#   facet_wrap(facets = "Type") +
+#   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+# varimp_scale <- tag_facet(varimp_scale)
+# varimp_scale <- shift_legend2(varimp_scale)
+# 
+# plot(varimp_scale)
+# ggsave(file="./sdm_analysis/outputs/fig_xx_relative influence of predictor types.svg", plot=varimp_scale, width=5, height=3)
 
 
 
@@ -426,13 +428,13 @@ var_tab <- read.csv("./sdm_analysis/variable_table.csv")
 
 mod1 <- readRDS("./sdm_analysis/sdms/cerw_dist_model_full.RDS")
 
-vars_plot_data <- as_tibble(summary(mod1)[1:10, ]) %>% #this gets variables in order of rel.inf
+vars_plot_data <- as_tibble(summary(mod1, plotit = FALSE)[1:29,]) %>% #this gets variables in order of rel.inf
   left_join(var_tab, by = c("var" = "var"))
 #get values to make partial effects plots
 vars_plot_data$plot_vals <- map(vars_plot_data$var, function(vars) plot.gbm(mod1, vars, return.grid = TRUE))
 
 
-plot_val_data <- vars_plot_data$plot_vals[c(1:9)] %>%
+plot_val_data <- vars_plot_data$plot_vals %>%
   bind_rows() %>%
   pivot_longer(cols = !y,
                values_drop_na = TRUE) %>%
@@ -447,32 +449,17 @@ effects_plot_cerw <-   ggplot(plot_val_data, aes(x = value, y = boot::inv.logit(
         strip.placement='outside',
         axis.text.x=element_blank())
 
-preds <- rast("./sdm_analysis/outputs/prediction_maps/cerw_dist_model_full.tiff")
-map_cerw <-   ggplot() +
-  geom_spatraster(data = preds) +
-  # scale_fill_continuous_divergingx(palette = 'Geyser', mid = 0, rev = TRUE) +
-  # scale_fill_whitebox_c(palette = "bl_yl_rd", direction = -1, na.value = "transparent")+
-  # scale_fill_viridis_c(option = "magma") +
-  # scale_fill_gradientn(colours = terrain.colors(7)) +
-  # scale_fill_gradient2(low = "white", mid = "yellow", high = "darkgreen", midpoint = .5) +
-  # scale_fill_distiller(palette="YlGn", direction = 1,na.value = "transparent") + #distiller for continuous palette
-  scale_fill_terrain_c() +   
-  geom_sf(data = bcr_albers, fill = NA, linewidth = 1.5) +
-  geom_sf(data = states, fill = NA, alpha = 0.5) +
-  labs(fill = "Habitat index")
-
-
 #GWWA
 var_tab <- read.csv("./sdm_analysis/variable_table.csv")
 
 mod1 <- readRDS("./sdm_analysis/sdms/gwwa_dist_model_full.RDS")
 
-vars_plot_data <- as_tibble(summary(mod1)[1:10, ]) %>%
+vars_plot_data <- as_tibble(summary(mod1, plotit = FALSE)[1:29,]) %>%
   left_join(var_tab, by = c("var" = "var"))
 
 vars_plot_data$plot_vals <- map(vars_plot_data$var, function(vars) plot.gbm(mod1, vars, return.grid = TRUE))
 
-plot_val_data <- vars_plot_data$plot_vals[c(1:9)] %>%
+plot_val_data <- vars_plot_data$plot_vals %>%
   bind_rows() %>%
   pivot_longer(cols = !y,
                values_drop_na = TRUE) %>%
@@ -487,24 +474,10 @@ effects_plot_gwwa <-   ggplot(plot_val_data, aes(x = value, y = boot::inv.logit(
         strip.placement='outside',
         axis.text.x=element_blank())
 
-preds <- rast("./sdm_analysis/outputs/prediction_maps/gwwa_dist_model_full.tiff")
-map_gwwa <-   ggplot() +
-  geom_spatraster(data = preds) +
-  scale_fill_terrain_c() + 
-  guides(fill = guide_colourbar(nrow = 1, position = "bottom", direction = "horizontal")) +
-  labs(fill = "Habitat index") +
-  geom_sf(data = bcr_albers, fill = NA, linewidth = 1.5) +
-  geom_sf(data = states, fill = NA, alpha = 0.5)
-
-
-fill_legend <- get_plot_component(map_gwwa, 'guide-box-bottom', return_all = TRUE)
 
 #combine plots
 test <- plot_grid(effects_plot_cerw,
-                  effects_plot_gwwa, 
-                  map_cerw+ theme(legend.position="none"), 
-                  map_gwwa+ theme(legend.position="none")) %>%
-  plot_grid(fill_legend, ncol = 1, rel_heights = c(1, 0.1))
+                  effects_plot_gwwa)
 plot(test)
 ggsave(test, filename = "./sdm_analysis/outputs/test.svg", dpi = 600, width = 6, height = 6)
 
